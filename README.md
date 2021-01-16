@@ -4,7 +4,7 @@ A work in progress bot that keeps important stuff at the bottom of channels
 ## Features
 * Unlike the others, EVERYTHING'S FREE!!
 * Unlimited stickies per channel, with commands to easily keep track
-* Fast sticky management (All data is cached from the database on start)
+* Fast sticky management (All data is cached from the local database on start)
 
 ### Commands:
     !sticky add <channel id> <discord message> - Add a sticky to a channel
