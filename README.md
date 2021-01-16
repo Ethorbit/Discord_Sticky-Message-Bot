@@ -6,6 +6,7 @@ A work in progress bot that keeps important stuff at the bottom of channels
 * Unlimited stickies per channel, with commands to easily keep track
 * Fast sticky management (All data is cached from the local database on start)
 * Channel-based timers for sticky cooldowns which reset when users send messages
+* Auto Sticky replacement (Keeps only 1 copy of a sticky in the assigned channels)
 
 ![Example Image](https://i.imgur.com/2RUZb2q.png)
 
