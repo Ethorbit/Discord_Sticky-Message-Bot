@@ -5,6 +5,9 @@ A work in progress bot that keeps important stuff at the bottom of channels
 * Unlike the others, EVERYTHING'S FREE!!
 * Unlimited stickies per channel, with commands to easily keep track
 * Fast sticky management (All data is cached from the local database on start)
+* Channel-based timers for sticky cooldowns which reset when users send messages
+
+![Example Image](https://i.imgur.com/2RUZb2q.png)
 
 ### Commands:
     !sticky add <channel id> <discord message> - Add a sticky to a channel
