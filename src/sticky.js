@@ -29,7 +29,10 @@ let dbOpened = false;
 
 class Stickies 
 {
-    stickies = null;
+    constructor()
+    {
+        this.stickies = null;
+    }
 
     InitStickies(server_id, channel_id)
     {
@@ -195,9 +198,14 @@ class Stickies
         }
     }
 
+    set stickies(stickies)
+    {
+        this._stickies = stickies;
+    }
+
     get stickies()
     {
-        return this.stickies;
+        return this._stickies;
     }
 }
 
