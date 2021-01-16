@@ -252,6 +252,9 @@ client.on("message", msg => {
             client.channels.fetch(channel_id).then(channel => {
                 ShowChannelStickies(server_id, msg.channel, true);
             }).catch(_ => {
+                if (channel_id != null)
+                    return SimpleMessage(msg.channel, "Example: 798815345905106945 (Right-click channel and Copy ID)", "Error getting channel ID", "error");
+
                 const stickyList = stickies.GetStickies(server_id, null);
                 if (typeof(stickyList) == "string")
                     return SimpleMessage(msg.channel, stickyList, "Error listing stickies", "error");
