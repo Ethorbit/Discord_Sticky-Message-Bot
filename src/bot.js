@@ -6,11 +6,18 @@ const { Stickies } = require("./sticky.js");
 
 const client = new Client();
 const stickies = new Stickies();
+
 const colors = new Object({
     "error" : 0xff0000,
     "sticky" : 0xffff00,
     "success" : 0x00ff00,
     "info" : 0x3399ff
+});
+
+const errors = new Object({
+    "invalid_channel" : "Example: 798815345905106945 (Right-click channel and Copy ID)",
+    "no_stickies_channel" : "There are no stickies for this channel.",
+    "no_stickies" : "There are no stickies to list."
 });
 
 var application = null;
@@ -120,7 +127,7 @@ function ShowChannelStickies(server_id, channel, info) // Show all stickies save
                     });
                 }
                 else if (info)
-                    SimpleMessage(msg.channel, "There are no stickies for this channel.", "Error listing stickies", "error");
+                    SimpleMessage(msg.channel, errors["no_stickies_channel"], "Error listing stickies", "error");
             }
             catch (error)
             {
@@ -134,7 +141,7 @@ function ShowChannelStickies(server_id, channel, info) // Show all stickies save
         }
     }
     else if (info)
-        SimpleMessage(msg.channel, "There are no stickies for this channel.", "Error listing stickies", "error");
+        SimpleMessage(msg.channel, errors["no_stickies_channel"], "Error listing stickies", "error");
 }
 
 client.on("message", msg => {
@@ -192,7 +199,7 @@ client.on("message", msg => {
                 }
             }).catch(error => {
                 console.error(error);
-                SimpleMessage(msg.channel, "Example: 798815345905106945 (Right-click channel and Copy ID)", "Error getting channel ID", "error");
+                SimpleMessage(msg.channel, errors["invalid_channel"], "Error getting channel ID", "error");
             });
         break;
         case "remove": // Remove a sticky
@@ -219,7 +226,7 @@ client.on("message", msg => {
                 }
             }).catch(error => {
                 console.error(error);
-                SimpleMessage(msg.channel, "Example: 798815345905106945 (Right-click channel and Copy ID)", "Error getting channel ID", "error");
+                SimpleMessage(msg.channel, errors["invalid_channel"], "Error getting channel ID", "error");
             });
         break;
         case "removeall":
@@ -238,7 +245,7 @@ client.on("message", msg => {
                 });
             }).catch(error => {
                 console.error(error);
-                SimpleMessage(msg.channel, "Example: 798815345905106945 (Right-click channel and Copy ID)", "Error getting channel ID", "error");
+                SimpleMessage(msg.channel, errors["invalid_channel"], "Error getting channel ID", "error");
             });
         break;
         case "preview":
@@ -259,7 +266,7 @@ client.on("message", msg => {
                 ShowChannelStickies(server_id, msg.channel, true);
             }).catch(_ => {
                 if (channel_id != null)
-                    return SimpleMessage(msg.channel, "Example: 798815345905106945 (Right-click channel and Copy ID)", "Error getting channel ID", "error");
+                    return SimpleMessage(msg.channel, errors["invalid_channel"], "Error getting channel ID", "error");
 
                 const stickyList = stickies.GetStickies(server_id, null);
                 if (typeof(stickyList) == "string")
@@ -290,7 +297,7 @@ client.on("message", msg => {
                             if (array.length - 1 == index)
                             {
                                 if (listEmbed.fields.length <= 0)
-                                    SimpleMessage(msg.channel, "There are no stickies to list.", "Error listing stickies", "error");
+                                    SimpleMessage(msg.channel, errors["no_stickies"], "Error listing stickies", "error");
                                 else
                                     msg.channel.send(listEmbed);
                             }
@@ -300,10 +307,10 @@ client.on("message", msg => {
                     });
 
                     if (!bStickiesExist)
-                        SimpleMessage(msg.channel, "There are no stickies to list.", "Error listing stickies", "error");
+                        SimpleMessage(msg.channel, errors["no_stickies"], "Error listing stickies", "error");
                 }
                 else
-                    SimpleMessage(msg.channel, "There are no stickies to list.", "Error listing stickies", "error");
+                    SimpleMessage(msg.channel, errors["no_stickies"], "Error listing stickies", "error");
             }); 
         break;
         default:
