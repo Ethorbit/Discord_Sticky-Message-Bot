@@ -31,7 +31,7 @@ client.on("ready", () => {
                             {
                                 if (message.author.bot && message.author.id == application.id)
                                 {
-                                    message.delete();
+                                    DeleteMessage(message);
                                 }
                             }
                         });  
@@ -52,6 +52,12 @@ client.on("channelDelete", (channel) => {
         console.log("Removed stickies for deleted channel:", server_id);
     });
 });
+
+function DeleteMessage(message)
+{
+    if (message != null && typeof(message.delete) == "function" && !message.deleted)
+        message.delete();
+}
 
 function SimpleMessage(channel, message, title, color, cb)
 {   
@@ -82,7 +88,7 @@ function ShowChannelStickies(server_id, channel, info) // Show all stickies save
             {
                 channel.lastStickyMessages.forEach((val) => {
                     if (val != null)
-                        val.delete();
+                        DeleteMessage(val);
                 });
             }
     
@@ -168,7 +174,7 @@ client.on("message", msg => {
                     SimpleMessage(msg.channel, "Please wait while I add the sticky..", "Processing", "sticky", (sentMessage) => {
                         stickies.AddSticky(server_id, channel_id, originalMsg, (val) => {
                             if (typeof(val) == "string")
-                                return SimpleMessage(msg.channel, val, "Error adding sticky!", "error", () => sentMessage.delete());
+                                return SimpleMessage(msg.channel, val, "Error adding sticky!", "error", () => DeleteMessage(sentMessage));
     
                             if (val)
                             {
@@ -176,11 +182,11 @@ client.on("message", msg => {
                                     ID: ${val} 
                                     Channel: ${channel.toString()}
                                 `, "Created sticky!", "success",
-                                    () => sentMessage.delete()
+                                    () => DeleteMessage(sentMessage)
                                 );
                             }
                             else
-                                SimpleMessage(msg.channel, "Unknown error, try again.", "Error adding sticky!", "error", sentMessage.delete());
+                                SimpleMessage(msg.channel, "Unknown error, try again.", "Error adding sticky!", "error", DeleteMessage(sentMessage));
                         });
                     });
                 }
@@ -202,12 +208,12 @@ client.on("message", msg => {
                         stickies.RemoveSticky(server_id, channel_id, sticky_id, (val) =>
                         {
                             if (typeof(val) == "string")
-                                return SimpleMessage(msg.channel, val, "Error deleting sticky", "error", () => sentMessage.delete());
+                                return SimpleMessage(msg.channel, val, "Error deleting sticky", "error", () => DeleteMessage(sentMessage));
     
                             if (val)
-                                SimpleMessage(msg.channel, `Successfully removed Sticky #${sticky_id} from ${channel.toString()}`, "Deleted sticky", "success", () => sentMessage.delete());
+                                SimpleMessage(msg.channel, `Successfully removed Sticky #${sticky_id} from ${channel.toString()}`, "Deleted sticky", "success", () => DeleteMessage(sentMessage));
                             else
-                                SimpleMessage(msg.channel, "There are no stickies with the ID for that channel.", "Error deleting sticky", "error", () => sentMessage.delete());
+                                SimpleMessage(msg.channel, "There are no stickies with the ID for that channel.", "Error deleting sticky", "error", () => DeleteMessage(sentMessage));
                         });
                     });
                 }
@@ -222,12 +228,12 @@ client.on("message", msg => {
                 SimpleMessage(msg.channel, `Please wait while I remove all stickies from: ${channel.toString()}`, "Processing", "sticky", (sentMessage) => {
                     stickies.RemoveChannelStickies(server_id, channel_id, (val) => {
                         if (typeof(val) == "string")
-                                return SimpleMessage(msg.channel, val, "Error deleting stickies", "error", () => sentMessage.delete());
+                                return SimpleMessage(msg.channel, val, "Error deleting stickies", "error", () => DeleteMessage(sentMessage));
                         
                         if (val)
-                            SimpleMessage(msg.channel, `Successfully removed all stickies from: ${channel.toString()}`, "Deleted stickies", "success", () => sentMessage.delete());
+                            SimpleMessage(msg.channel, `Successfully removed all stickies from: ${channel.toString()}`, "Deleted stickies", "success", () => DeleteMessage(sentMessage));
                         else
-                            SimpleMessage(msg.channel, "There were no stickies in that channel.", "Error deleting stickies", "error", () => sentMessage.delete()); 
+                            SimpleMessage(msg.channel, "There were no stickies in that channel.", "Error deleting stickies", "error", () => DeleteMessage(sentMessage)); 
                     })
                 });
             }).catch(error => {
