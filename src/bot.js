@@ -127,6 +127,8 @@ function ShowChannelStickies(server_id, channel, info) // Show all stickies save
             channel.lastStickyTime = Date.now() + STICKY_DELAY;
         }
     }
+    else if (info)
+        SimpleMessage(msg.channel, "There are no stickies for this channel.", "Error listing stickies", "error");
 }
 
 client.on("message", msg => {
