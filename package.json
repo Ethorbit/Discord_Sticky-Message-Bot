@@ -1,19 +1,27 @@
 {
-  "name": "sticky-message-bot",
+  "name": "Discord_Sticky-Message-Bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "A work in progress bot that keeps important stuff at the bottom of channels",
   "main": "index.js",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0",
+    "sqlite3": "^5.0.0"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/bot.js",
-    "dev": "nodemon src/bot.js"
+    "dev": "nodemon ./src/bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ethorbit/Discord_Sticky-Message-Bot.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "discord.js": "^12.5.1",
-    "dotenv": "^8.2.0",
-    "sqlite3": "^5.0.1"
-  }
+  "bugs": {
+    "url": "https://github.com/Ethorbit/Discord_Sticky-Message-Bot/issues"
+  },
+  "homepage": "https://github.com/Ethorbit/Discord_Sticky-Message-Bot#readme"
 }
