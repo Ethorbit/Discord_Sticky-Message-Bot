@@ -25,4 +25,4 @@ A work in progress bot that keeps important stuff at the bottom of channels
 
 ## ![DockerHub](https://i.imgur.com/tItmtNW.png) Docker
 Instantly deploy on a server using Docker: https://hub.docker.com/r/ethorbit/discord_sticky-message-bot
-> docker run -dit --name sticky-bot ethorbit/discord_sticky-message-bot:linux -e BOT_TOKEN="MyTokenHere" STICKY_COOLDOWN=20000
+> docker run -dit -e BOT_TOKEN="MyToken" -e STICKY_COOLDOWN="20000" --name sticky-bot ethorbit/discord_sticky-message-bot:linux
