@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const STICKY_COOLDOWN = isNaN(process.env.STICKY_COOLDOWN) ? 20000 : process.env.STICKY_COOLDOWN; 
+const STICKY_COOLDOWN = isNaN(parseInt(process.env.STICKY_COOLDOWN)) ? 20000 : process.env.STICKY_COOLDOWN; 
 const { Client, MessageEmbed } = require("discord.js");
 const { Stickies } = require("./sticky.js");
 const client = new Client();
@@ -135,7 +135,7 @@ function ShowChannelStickies(server_id, channel, info) // Show all stickies save
         else
         {
             // Reset time when someone posts a message so it never interrupts people
-            channel.lastStickyTime = Date.now() + STICKY_COOLDOWN;
+            channel.lastStickyTime = Date.now();
         }
     }
     else if (info)
