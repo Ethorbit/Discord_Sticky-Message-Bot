@@ -89,7 +89,7 @@ function ShowChannelStickies(server_id, channel, info_channel) // Show all stick
     {
         if (info_channel != null || channel.lastStickyTime == null || Date.now() - channel.lastStickyTime >= STICKY_COOLDOWN) // Wait a bit, we don't wanna interrupt conversations
         {
-            if (channel.lastStickyMessages != null)
+            if (info_channel == null && channel.lastStickyMessages != null)
             {
                 channel.lastStickyMessages.forEach((val) => {
                     if (val != null)
@@ -116,7 +116,9 @@ function ShowChannelStickies(server_id, channel, info_channel) // Show all stick
                             stickyEmbed.title =  `Sticky #${index + 1}`;
                     
                         stickyEmbed.description = val["message"];
-                        channel.lastStickyTime = Date.now();
+
+                        if (info_channel == null)
+                            channel.lastStickyTime = Date.now();
 
                         const sendChannel = info_channel != null ? info_channel : channel;
                         sendChannel.send(stickyEmbed).then(sentMessage => {
