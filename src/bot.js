@@ -83,7 +83,7 @@ function SimpleMessage(channel, message, title, color, cb)
         console.error("Invalid color specified!");
 }
 
-function ShowChannelStickies(server_id, channel, info) // Show all stickies saved to a channel
+function ShowChannelStickies(server_id, channel, info_channel, info) // Show all stickies saved to a channel
 {
     if (stickies.ValidStickyChannel(server_id, channel.id))
     {
@@ -118,14 +118,15 @@ function ShowChannelStickies(server_id, channel, info) // Show all stickies save
                         stickyEmbed.description = val["message"];
                         channel.lastStickyTime = Date.now();
 
-                        channel.send(stickyEmbed).then(sentMessage => {
+                        const sendChannel = info_channel != null ? info_channel : channel;
+                        sendChannel.send(stickyEmbed).then(sentMessage => {
                             if (!info)
                                 channel.lastStickyMessages.push(sentMessage);
                         });
                     });
                 }
                 else if (info)
-                    SimpleMessage(msg.channel, errors["no_stickies_channel"], "Error listing stickies", "error");
+                    SimpleMessage(info_channel, errors["no_stickies_channel"], "Error listing stickies", "error");
             }
             catch (error)
             {
@@ -139,7 +140,7 @@ function ShowChannelStickies(server_id, channel, info) // Show all stickies save
         }
     }
     else if (info)
-        SimpleMessage(msg.channel, errors["no_stickies_channel"], "Error listing stickies", "error");
+        SimpleMessage(info_channel, errors["no_stickies_channel"], "Error listing stickies", "error");
 }
 
 client.on("message", msg => {
@@ -261,11 +262,11 @@ client.on("message", msg => {
         case "list": // List stickies from channel or all channels with stickies
             channel_id = msgParams[2];
             client.channels.fetch(channel_id).then(channel => {
-                ShowChannelStickies(server_id, msg.channel, true);
-            }).catch(_ => {
+                ShowChannelStickies(server_id, channel, msg.channel, true);
+            }).catch(error => {
                 if (channel_id != null)
                     return SimpleMessage(msg.channel, errors["invalid_channel"], "Error getting channel ID", "error");
-
+                    
                 const stickyList = stickies.GetStickies(server_id, null);
                 if (typeof(stickyList) == "string")
                     return SimpleMessage(msg.channel, stickyList, "Error listing stickies", "error");
@@ -330,7 +331,7 @@ client.on("message", msg => {
     }  
     else
     {
-        ShowChannelStickies(msg.guild.id, msg.channel, false);     
+        ShowChannelStickies(msg.guild.id, msg.channel, null, false);     
     }
 });
 

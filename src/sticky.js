@@ -168,7 +168,7 @@ class Stickies
 
     ValidStickyChannel(server_id, channel_id)
     {
-        return this.stickies && this.stickies[server_id] && this.stickies[server_id][channel_id];
+        return this.stickies != null && this.stickies[server_id] != null && this.stickies[server_id][channel_id] != null;
     }
 
     GetStickies(server_id, channel_id) // Without channel_id, get all channels that have stickies, otherwise get all stickies in channel
@@ -176,7 +176,7 @@ class Stickies
         if (db == null || !dbOpened)
             return "Attempts to open the database have been unsuccessful, try again later..";
 
-        if (this.stickies == null || !this.stickies[server_id])
+        if (this.stickies == null || this.stickies[server_id] == null)
             return false;
 
         if (channel_id == null)
