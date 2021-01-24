@@ -38,10 +38,12 @@ client.on("ready", () => {
                                 if (message.author.bot && message.author.id == application.id)
                                 {
                                     // Only remove sticky messages (So commands stay visible)
-                                    if (message.embeds[0] != null && message.embeds[0].color == colors["sticky"])
-                                        DeleteMessage(message);
+                                    if (message.embeds[0] == null)
+                                       DeleteMessage(message);
                                 }
                             }
+                        }).then(() => {
+                            ShowChannelStickies(server_id, channel, null);
                         });  
                     }
                     catch(error)
@@ -126,24 +128,17 @@ function ShowChannelStickies(server_id, channel, info_channel) // Show all stick
                 if (stickyList != null && stickyList != false)
                 {
                     stickyList.forEach((val, index, _) => {
-                        // const stickyEmbed = new MessageEmbed();
-                        // stickyEmbed.color = info_channel != null ? colors["info"] : colors["sticky"];
-        
-                        // if (info_channel != null)
-                        //     stickyEmbed.title =  `Sticky #${index + 1}`;
-                        
-                        // stickyEmbed.description = val["message"];
-
-                        // const sendChannel = info_channel != null ? info_channel : channel;
-                        // sendChannel.send(stickyEmbed).then(sentMessage => {
-                        //     if (info_channel == null)
-                        //         channel.lastStickyMessages.push(sentMessage);
-                        // });
+                        const sendChannel = info_channel != null ? info_channel : channel;
+                        if (info_channel != null)
+                        {
+                            const stickyEmbed = new MessageEmbed();
+                            stickyEmbed.title =  `Sticky #${index + 1}`;
+                            sendChannel.send(stickyEmbed);
+                        }
 
                         if (info_channel == null)
                             channel.lastStickyTime = Date.now();
 
-                        const sendChannel = info_channel != null ? info_channel : channel;
                         sendChannel.send(val["message"]).then(sentMessage => {
                             sentMessage.suppressEmbeds(true);
 
@@ -215,8 +210,10 @@ client.on("message", msg => {
                                     ID: ${val} 
                                     Channel: ${channel.toString()}
                                 `, "Created sticky!", "success",
-                                    () => DeleteMessage(sentMessage)
-                                );
+                                () => {
+                                    DeleteMessage(sentMessage)
+                                    ShowChannelStickies(server_id, channel, null);
+                                });
                             }
                             else
                                 SimpleMessage(msg.channel, "Unknown error, try again.", "Error adding sticky!", "error", DeleteMessage(sentMessage));
@@ -259,13 +256,13 @@ client.on("message", msg => {
                 else
                 {
                     SimpleMessage(msg.channel, "Please wait while I remove that sticky..", "Processing", "sticky", (sentMessage) => {
-                        stickies.RemoveSticky(server_id, channel_id, sticky_id, (val) =>
+                        stickies.RemoveSticky(server_id, channel_id, sticky_id, (val, messageStr) =>
                         {
                             if (typeof(val) == "string")
                                 return SimpleMessage(msg.channel, val, "Error deleting sticky", "error", () => DeleteMessage(sentMessage));
     
                             if (val)
-                                SimpleMessage(msg.channel, `Successfully removed Sticky #${sticky_id} from ${channel.toString()}`, "Deleted sticky", "success", () => DeleteMessage(sentMessage));
+                                SimpleMessage(msg.channel, `Successfully removed Sticky #${sticky_id} from ${channel.toString()}`, "Deleted sticky", "success", () => DeleteMessage(sentMessage)); 
                             else
                                 SimpleMessage(msg.channel, errors["no_sticky_id"], "Error deleting sticky", "error", () => DeleteMessage(sentMessage));
                         });
@@ -295,15 +292,17 @@ client.on("message", msg => {
             });
         break;
         case "preview":
-            if (msgParams[2] != null)
+            const input_message = msgParams[2];
+            const test_id = GetMessageChannelID(input_message);
+            if (input_message != null)
             {
-                originalMsg = originalMsg.replace(msgParams[1], "");
-                
-                // const stickyEmbed = new MessageEmbed();
-                // stickyEmbed.color = colors["sticky"];
-                // stickyEmbed.description = originalMsg;
-                msg.channel.send(originalMsg).then(sentMessage => {
-                    sentMessage.suppressEmbeds(true);
+                client.channels.fetch(test_id).then(channel => {
+                    ShowChannelStickies(server_id, channel, msg.channel);
+                }).catch(_ => {
+                    originalMsg = originalMsg.replace(msgParams[1], "");
+                    msg.channel.send(originalMsg).then(sentMessage => {
+                        sentMessage.suppressEmbeds(true);
+                    });
                 });
             }
         break;

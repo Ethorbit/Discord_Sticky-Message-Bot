@@ -159,6 +159,7 @@ class Stickies
         if (this.stickies[server_id] && this.stickies[server_id][channel_id]) 
         {
             const ele = this.stickies[server_id][channel_id][sticky_id - 1];
+            const deleted_message = ele.message;
             if (ele != null && ele != -1)
             {   
                 this.stickies[server_id][channel_id].splice(sticky_id - 1, 1);
@@ -174,7 +175,7 @@ class Stickies
                         if (error != null)
                             console.error(error.message);
                         else
-                            cb(true);
+                            cb(true, deleted_message);
                     });
                 });
             }
