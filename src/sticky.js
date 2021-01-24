@@ -26,6 +26,7 @@ let dbOpened = false;
         }  
     }); 
 }());
+const DB_ERROR = "Attempts to open the database have been unsuccessful, try again later..";
 
 class Stickies 
 {
@@ -54,29 +55,38 @@ class Stickies
         if (db == null || !dbOpened)
             return;
 
-        // Remove sql entries for non-existent channels for each server
-        db.parallelize(() => {
-            for (const [valid_server_id, valid_server] of servers.cache)
-            {   
-                const valid_channel_ids = new Array();
-                let invalid_channel_sql = `DELETE FROM stickies WHERE server_id = ${valid_server_id} AND channel_id NOT IN(`;
+        // // Commented out for now, as a risk of Discord outages may cause this to wipe important data
+        // db.parallelize(() => {
+        //     // Remove entries for non-existent channels for each server
+        //     const valid_server_ids = new Array();
+        //     for (const [valid_server_id, valid_server] of servers.cache)
+        //     {   
+        //         valid_server_ids.push(valid_server_id);
+
+        //         const valid_channel_ids = new Array();
+        //         let invalid_channel_sql = `DELETE FROM stickies WHERE server_id = ${valid_server_id} AND channel_id NOT IN(`;
     
-                for (const [valid_channel_id, valid_channel] of valid_server.channels.cache)
-                {
-                    if (valid_channel.type == "text")
-                        valid_channel_ids.push(valid_channel_id);
-                }
+        //         for (const [valid_channel_id, valid_channel] of valid_server.channels.cache)
+        //         {
+        //             if (valid_channel.type == "text")
+        //                 valid_channel_ids.push(valid_channel_id);
+        //         }
     
-                invalid_channel_sql += valid_channel_ids.toString() + ")";
-                db.run(invalid_channel_sql, (error) => {
-                    if (error != null)
-                        console.error(error.message);
-                });
-            }
-        });
+        //         invalid_channel_sql += valid_channel_ids.toString() + ")";
+        //         db.run(invalid_channel_sql, (error) => {
+        //             if (error != null)
+        //                 console.error(error.message);
+        //         });
+        //     }
+
+        //     // Remove entries for unavailable servers
+        //     db.run(`DELETE FROM stickies WHERE server_id NOT IN (${valid_server_ids.toString()})`, (error) => {
+        //         if (error != null)
+        //             console.error(error.message);
+        //     });
+        // });
 
         // Load ALL SQL data into array (THIS WOULD CERTAINLY HIT SOME LIMITS IF THIS WERE A POPULAR BOT)
-        //this.stickies = new Object();
         this.InitStickies();
         db.each("SELECT * FROM stickies", (error, value) => {
             if (error != null)
@@ -99,7 +109,7 @@ class Stickies
     AddSticky(server_id, channel_id, message, cb) // Add sticky to sticky array and database stickies
     {   
         if (db == null || !dbOpened)
-            return cb("Attempts to open the database have been unsuccessful, try again later..");
+            return cb(DB_ERROR);
 
         if (this.stickies == null)
             return cb(false);
@@ -115,10 +125,34 @@ class Stickies
         });
     }
 
+    EditSticky(server_id, channel_id, sticky_id, discord_message, cb) // Modify existing sticky in channel
+    {
+        if (db == null || !dbOpened)
+            return cb(DB_ERROR);
+
+        if (this.stickies == null)
+            return cb(false);
+
+        if (this.stickies[server_id] && this.stickies[server_id][channel_id] && this.stickies[server_id][channel_id][sticky_id - 1])
+        {
+            this.stickies[server_id][channel_id][sticky_id - 1].message = discord_message;
+            db.run("UPDATE stickies SET message = ? WHERE server_id = ? AND channel_id = ? AND sticky_id = ?", 
+                [discord_message, server_id, channel_id, sticky_id], (error) => {
+                    if (error != null)
+                        return cb(error.message);
+                    else
+                        return cb(true);
+                }
+            );
+        }
+        else
+            cb(false);
+    }
+
     RemoveSticky(server_id, channel_id, sticky_id, cb) // Remove specific sticky 
     {   
         if (db == null || !dbOpened)
-            return cb("Attempts to open the database have been unsuccessful, try again later..");
+            return cb(DB_ERROR);
 
         if (this.stickies == null)
             return cb(false);
@@ -158,10 +192,18 @@ class Stickies
     
             this.stickies[server_id][channel_id].length = 0;
             db.run("DELETE FROM stickies WHERE server_id = ? AND channel_id = ?", [server_id, channel_id], (error) => {
-                if (error != null)
-                    cb(`Couldn't delete all stickies from the channel in the database (${error.message})`);
-                else
-                    cb(true);
+                cb();
+            });
+        }
+    }
+
+    RemoveServerStickies(server_id, cb)
+    {
+        if (this.stickies[server_id])
+        {
+            delete this.stickies[server_id];
+            db.run("DELETE FROM stickies WHERE server_id = ?", [server_id], (error) => {
+                cb();
             });
         }
     }
@@ -174,7 +216,7 @@ class Stickies
     GetStickies(server_id, channel_id) // Without channel_id, get all channels that have stickies, otherwise get all stickies in channel
     {
         if (db == null || !dbOpened)
-            return "Attempts to open the database have been unsuccessful, try again later..";
+            return DB_ERROR;
 
         if (this.stickies == null || this.stickies[server_id] == null)
             return false;

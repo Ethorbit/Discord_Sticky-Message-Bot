@@ -15,7 +15,8 @@ const colors = new Object({
 const errors = new Object({
     "invalid_channel" : "Example: 798815345905106945 (Right-click channel and Copy ID)",
     "no_stickies_channel" : "There are no stickies for this channel.",
-    "no_stickies" : "There are no stickies to list."
+    "no_stickies" : "There are no stickies to list.",
+    "no_sticky_id" : "There are no stickies with the ID for that channel."
 });
 
 var application = null;
@@ -36,7 +37,9 @@ client.on("ready", () => {
                             {
                                 if (message.author.bot && message.author.id == application.id)
                                 {
-                                    DeleteMessage(message);
+                                    // Only remove sticky messages (So commands stay visible)
+                                    if (message.embeds[0] != null && message.embeds[0].color == colors["sticky"])
+                                        DeleteMessage(message);
                                 }
                             }
                         });  
@@ -51,10 +54,18 @@ client.on("ready", () => {
     });
 });
 
-client.on("channelDelete", (channel) => {
+// Delete all stickies from a channel it's deleted
+client.on("channelDelete", channel => {
     const server_id = channel.guild.id;
     stickies.RemoveChannelStickies(server_id, channel.id, () => {
-        console.log("Removed stickies for deleted channel:", server_id);
+        console.log(`Removed stickies for deleted channel ${channel.id} from server: ${server_id}`);
+    });
+});
+
+// Delete all stickies from a server when it's deleted
+client.on("guildDelete", guild => {
+    stickies.RemoveServerStickies(guild.id, () => {
+        console.log("Removed stickies from server: ", guild.id);
     });
 });
 
@@ -149,12 +160,13 @@ client.on("message", msg => {
     if (msg.author.bot)
         return;
 
-    let originalMsg = msg.content;
     const msgParams = msg.content.toLowerCase().split(" ");
     const server_id = msg.guild.id;
     
     if (msgParams[0] == "!sticky")
     {   
+        let originalMsg = msg.content.replace(msgParams[0], "");
+
         if (!msg.member.hasPermission("MANAGE_CHANNELS"))
         {
             SimpleMessage(msg.channel, "You need the 'Manage Channels' permission.", "Insufficient Privileges!", "error");
@@ -167,7 +179,6 @@ client.on("message", msg => {
         {
         case "add": // Add a sticky
             channel_id = msgParams[2]; 
-            originalMsg = originalMsg.replace(msgParams[0], "");
             originalMsg = originalMsg.replace(msgParams[1], "");
             originalMsg = originalMsg.replace(msgParams[2], "");
 
@@ -198,8 +209,29 @@ client.on("message", msg => {
                         });
                     });
                 }
-            }).catch(error => {
-                console.error(error);
+            }).catch(_ => {
+                SimpleMessage(msg.channel, errors["invalid_channel"], "Error getting channel ID", "error");
+            });
+        break;
+        case "edit": // Modify channel sticky
+            channel_id = msgParams[2];
+            sticky_id = msgParams[3];
+            client.channels.fetch(channel_id).then(channel => {
+                SimpleMessage(msg.channel, "Please wait while I change that sticky's message...", "Processing", "sticky", (sentMessage) => {
+                    originalMsg = originalMsg.replace(msgParams[1], "");
+                    originalMsg = originalMsg.replace(msgParams[2], "");
+                    originalMsg = originalMsg.replace(msgParams[3], "");
+                    stickies.EditSticky(server_id, channel_id, sticky_id, originalMsg, (val) => {
+                        if (typeof(val) == "string")
+                            return SimpleMessage(msg.channel, val, "Error changing sticky", "error", () => DeleteMessage(sentMessage));
+
+                        if (val)
+                            SimpleMessage(msg.channel, `Successfully changed Sticky #${sticky_id}'s content`, "Modified sticky", "success", () => DeleteMessage(sentMessage));
+                        else
+                            SimpleMessage(msg.channel, errors["no_sticky_id"], "Error editing sticky", "error", () => DeleteMessage(sentMessage)); 
+                    });
+                });
+            }).catch(_ => {
                 SimpleMessage(msg.channel, errors["invalid_channel"], "Error getting channel ID", "error");
             });
         break;
@@ -221,12 +253,11 @@ client.on("message", msg => {
                             if (val)
                                 SimpleMessage(msg.channel, `Successfully removed Sticky #${sticky_id} from ${channel.toString()}`, "Deleted sticky", "success", () => DeleteMessage(sentMessage));
                             else
-                                SimpleMessage(msg.channel, "There are no stickies with the ID for that channel.", "Error deleting sticky", "error", () => DeleteMessage(sentMessage));
+                                SimpleMessage(msg.channel, errors["no_sticky_id"], "Error deleting sticky", "error", () => DeleteMessage(sentMessage));
                         });
                     });
                 }
-            }).catch(error => {
-                console.error(error);
+            }).catch(_ => {
                 SimpleMessage(msg.channel, errors["invalid_channel"], "Error getting channel ID", "error");
             });
         break;
@@ -252,7 +283,6 @@ client.on("message", msg => {
         case "preview":
             if (msgParams[2] != null)
             {
-                originalMsg = originalMsg.replace(msgParams[0], "");
                 originalMsg = originalMsg.replace(msgParams[1], "");
                 
                 const stickyEmbed = new MessageEmbed();
@@ -321,6 +351,7 @@ client.on("message", msg => {
 
             embed.addField("Commands", `
                 !sticky add <channel id> <discord message> - Add a sticky to a channel
+                !sticky edit <channel id> <sticky id> <discord message> - Change sticky message
                 !sticky remove <channel id> <sticky id> - Remove a sticky from a channel
                 !sticky removeall <channel id> - Remove all stickies from a channel
                 !sticky preview <discord message> - Preview what a sticky looks like
