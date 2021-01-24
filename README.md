@@ -18,7 +18,7 @@ A work in progress bot that keeps important stuff at the bottom of channels
     !sticky preview <discord message> - Preview what a sticky looks like
     !sticky list <channel id> - List stickies in a channel
     !sticky list - List all channels with stickies
-    !sticky - list all commands
+    !sticky - List all commands
     
 # Installation
 ### Environment Variables
