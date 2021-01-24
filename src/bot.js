@@ -13,7 +13,7 @@ const colors = new Object({
 });
 
 const errors = new Object({
-    "invalid_channel" : "Example: 798815345905106945 (Right-click channel and Copy ID)",
+    "invalid_channel" : "Example: 798815345905106945 (Right-click channel and Copy ID, or tag the channel #a-channel)",
     "no_stickies_channel" : "There are no stickies for this channel.",
     "no_stickies" : "There are no stickies to list.",
     "no_sticky_id" : "There are no stickies with the ID for that channel."
@@ -92,6 +92,12 @@ function SimpleMessage(channel, message, title, color, cb)
     }
     else
         console.error("Invalid color specified!");
+}
+
+function GetMessageChannelID(message)
+{
+    if (typeof(message) != "string") return;
+    return message.replace("#", "").replace("<", "").replace(">", "");
 }
 
 function ShowChannelStickies(server_id, channel, info_channel) // Show all stickies saved to a channel
@@ -178,7 +184,7 @@ client.on("message", msg => {
         switch (msgParams[1]) 
         {
         case "add": // Add a sticky
-            channel_id = msgParams[2]; 
+            channel_id = GetMessageChannelID(msgParams[2]); 
             originalMsg = originalMsg.replace(msgParams[1], "");
             originalMsg = originalMsg.replace(msgParams[2], "");
 
@@ -214,7 +220,7 @@ client.on("message", msg => {
             });
         break;
         case "edit": // Modify channel sticky
-            channel_id = msgParams[2];
+            channel_id = GetMessageChannelID(msgParams[2]);
             sticky_id = msgParams[3];
             client.channels.fetch(channel_id).then(channel => {
                 SimpleMessage(msg.channel, "Please wait while I change that sticky's message...", "Processing", "sticky", (sentMessage) => {
@@ -236,7 +242,7 @@ client.on("message", msg => {
             });
         break;
         case "remove": // Remove a sticky
-            channel_id = msgParams[2]; 
+            channel_id = GetMessageChannelID(msgParams[2]); 
             sticky_id = msgParams[3];
 
             client.channels.fetch(channel_id).then(channel => {
@@ -262,7 +268,7 @@ client.on("message", msg => {
             });
         break;
         case "removeall":
-            channel_id = msgParams[2]; 
+            channel_id = GetMessageChannelID(msgParams[2]); 
             client.channels.fetch(channel_id).then(channel => {
                 SimpleMessage(msg.channel, `Please wait while I remove all stickies from: ${channel.toString()}`, "Processing", "sticky", (sentMessage) => {
                     stickies.RemoveChannelStickies(server_id, channel_id, (val) => {
@@ -292,7 +298,7 @@ client.on("message", msg => {
             }
         break;
         case "list": // List stickies from channel or all channels with stickies
-            channel_id = msgParams[2];
+            channel_id = GetMessageChannelID(msgParams[2]);
             client.channels.fetch(channel_id).then(channel => {
                 ShowChannelStickies(server_id, channel, msg.channel);
             }).catch(error => {
