@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const STICKY_COOLDOWN = isNaN(parseInt(process.env.STICKY_COOLDOWN)) ? 20000 : process.env.STICKY_COOLDOWN; 
-const { Client, MessageEmbed } = require("discord.js");
+const { Client, MessageEmbed, Message } = require("discord.js");
 const { Stickies } = require("./sticky.js");
 const client = new Client();
 const stickies = new Stickies();
@@ -126,19 +126,27 @@ function ShowChannelStickies(server_id, channel, info_channel) // Show all stick
                 if (stickyList != null && stickyList != false)
                 {
                     stickyList.forEach((val, index, _) => {
-                        const stickyEmbed = new MessageEmbed();
-                        stickyEmbed.color = info_channel != null ? colors["info"] : colors["sticky"];
+                        // const stickyEmbed = new MessageEmbed();
+                        // stickyEmbed.color = info_channel != null ? colors["info"] : colors["sticky"];
         
-                        if (info_channel != null)
-                            stickyEmbed.title =  `Sticky #${index + 1}`;
-                    
-                        stickyEmbed.description = val["message"];
+                        // if (info_channel != null)
+                        //     stickyEmbed.title =  `Sticky #${index + 1}`;
+                        
+                        // stickyEmbed.description = val["message"];
+
+                        // const sendChannel = info_channel != null ? info_channel : channel;
+                        // sendChannel.send(stickyEmbed).then(sentMessage => {
+                        //     if (info_channel == null)
+                        //         channel.lastStickyMessages.push(sentMessage);
+                        // });
 
                         if (info_channel == null)
                             channel.lastStickyTime = Date.now();
 
                         const sendChannel = info_channel != null ? info_channel : channel;
-                        sendChannel.send(stickyEmbed).then(sentMessage => {
+                        sendChannel.send(val["message"]).then(sentMessage => {
+                            sentMessage.suppressEmbeds(true);
+
                             if (info_channel == null)
                                 channel.lastStickyMessages.push(sentMessage);
                         });
@@ -291,10 +299,12 @@ client.on("message", msg => {
             {
                 originalMsg = originalMsg.replace(msgParams[1], "");
                 
-                const stickyEmbed = new MessageEmbed();
-                stickyEmbed.color = colors["sticky"];
-                stickyEmbed.description = originalMsg;
-                msg.channel.send(stickyEmbed);
+                // const stickyEmbed = new MessageEmbed();
+                // stickyEmbed.color = colors["sticky"];
+                // stickyEmbed.description = originalMsg;
+                msg.channel.send(originalMsg).then(sentMessage => {
+                    sentMessage.suppressEmbeds(true);
+                });
             }
         break;
         case "list": // List stickies from channel or all channels with stickies
