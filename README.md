@@ -1,5 +1,5 @@
 # Discord_Sticky-Message-Bot
-A work in progress bot that keeps important stuff at the bottom of channels
+A bot that keeps important stuff at the bottom of channels
 
 ## Features
 * Unlike the others, EVERYTHING'S FREE!!
