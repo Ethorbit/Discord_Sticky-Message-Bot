@@ -12,6 +12,7 @@ A work in progress bot that keeps important stuff at the bottom of channels
 
 ### Commands:
     !sticky add <channel id> <discord message> - Add a sticky to a channel
+    !sticky edit <channel id> <sticky id> <discord message> - Edit existing sticky from a channel
     !sticky remove <channel id> <sticky id> - Remove a sticky from a channel
     !sticky removeall <channel id> - Remove all stickies from a channel
     !sticky preview <discord message> - Preview what a sticky looks like
