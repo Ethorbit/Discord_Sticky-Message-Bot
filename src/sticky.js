@@ -160,7 +160,11 @@ class Stickies
         if (this.stickies[server_id] && this.stickies[server_id][channel_id]) 
         {
             const ele = this.stickies[server_id][channel_id][sticky_id - 1];
+            if (!ele || !ele.message)
+                return cb(false);
+
             const deleted_message = ele.message;
+   
             if (ele != null && ele != -1)
             {   
                 this.stickies[server_id][channel_id].splice(sticky_id - 1, 1);
