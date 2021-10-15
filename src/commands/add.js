@@ -3,8 +3,8 @@ const Errors = require("../errors.js");
 
 function Run(client, msg)
 {
-    const server_id = msg.guild.id;
     const msgParams = msg.content.toLowerCase().split(" ");
+    const server_id = msg.guild.id;
     const channel_id = BotFunctions.GetMessageChannelID(msgParams[2]); 
     const originalMsg = msg.content.replace(msgParams[0], "").replace(msgParams[1], "").replace(msgParams[2], "");
 

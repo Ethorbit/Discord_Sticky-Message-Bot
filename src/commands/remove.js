@@ -4,8 +4,9 @@ const Errors = require("../errors.js");
 function Run(client, msg)
 {
     const msgParams = msg.content.toLowerCase().split(" ");
-    channel_id = BotFunctions.GetMessageChannelID(msgParams[2]); 
-    sticky_id = msgParams[3];
+    const server_id = msg.guild.id;
+    const channel_id = BotFunctions.GetMessageChannelID(msgParams[2]); 
+    const sticky_id = msgParams[3];
 
     client.channels.fetch(channel_id).then(channel => {
         if (sticky_id == null)

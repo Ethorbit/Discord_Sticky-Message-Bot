@@ -3,8 +3,8 @@ const Errors = require("../errors.js");
 
 function Run(client, msg)
 {
-    const server_id = msg.guild.id;
     const msgParams = msg.content.toLowerCase().split(" ");
+    const server_id = msg.guild.id;
     const channel_id = GetMessageChannelID(msgParams[2]);
     const sticky_id = msgParams[3];
 

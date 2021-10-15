@@ -4,7 +4,8 @@ const Errors = require("../errors.js");
 function Run(client, msg)
 {
     const msgParams = msg.content.toLowerCase().split(" ");
-    channel_id = BotFunctions.GetMessageChannelID(msgParams[2]); 
+    const server_id = msg.guild.id;
+    const channel_id = BotFunctions.GetMessageChannelID(msgParams[2]); 
     
     client.channels.fetch(channel_id).then(channel => {
         BotFunctions.SimpleMessage(msg.channel, `Please wait while I remove all stickies from: ${channel.toString()}`, "Processing", "sticky", (sentMessage) => {
