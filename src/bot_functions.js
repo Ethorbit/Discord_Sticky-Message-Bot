@@ -47,7 +47,7 @@ var exported = {
                 {
                     channel.lastStickyMessages.forEach((val) => {
                         if (val != null)
-                            DeleteMessage(val);
+                            this.DeleteMessage(val);
                     });
                 }
         

@@ -193,9 +193,11 @@ class Stickies
     
             this.stickies[server_id][channel_id].length = 0;
             db.run("DELETE FROM stickies WHERE server_id = ? AND channel_id = ?", [server_id, channel_id], (error) => {
-                cb();
+                cb(!error ? true : error.message);
             });
         }
+        else
+            cb(false);   
     }
 
     RemoveServerStickies(server_id, cb)
