@@ -18,13 +18,13 @@ global.stickies = new Stickies();
 
 client.fetchApplication().then(app => global.discordApplication = app);
 client.on("ready", () => {  
-    stickies.LoadStickies(client.guilds, () => {
+    global.stickies.LoadStickies(client.guilds, () => {
         // Delete all Sticky bot messages in the last 50 messages for every server's channels
         for (const [server_id, server] of client.guilds.cache)
         {
             for (const [channel_id, channel] of server.channels.cache)
             {
-                if (stickies.ValidStickyChannel(server_id, channel_id))
+                if (global.stickies.ValidStickyChannel(server_id, channel_id))
                 {
                     try
                     {
@@ -55,14 +55,14 @@ client.on("ready", () => {
 // Delete all stickies from a channel it's deleted
 client.on("channelDelete", channel => {
     const server_id = channel.guild.id;
-    stickies.RemoveChannelStickies(server_id, channel.id, () => {
+    global.stickies.RemoveChannelStickies(server_id, channel.id, () => {
         console.log(`Removed stickies for deleted channel ${channel.id} from server: ${server_id}`);
     });
 });
 
 // Delete all stickies from a server when it's deleted
 client.on("guildDelete", guild => {
-    stickies.RemoveServerStickies(guild.id, () => {
+    global.stickies.RemoveServerStickies(guild.id, () => {
         console.log("Removed stickies from server: ", guild.id);
     });
 });

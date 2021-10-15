@@ -2,7 +2,6 @@ const STICKY_COOLDOWN = isNaN(parseInt(process.env.STICKY_COOLDOWN)) ? 20000 : p
 
 const Errors = require("./errors.js");
 const Colors = require("./colors.js");
-const stickies = require("./stickies.js");
 
 const { MessageEmbed } = require("discord.js");
 
@@ -40,7 +39,7 @@ var exported = {
 
     ShowChannelStickies: function(server_id, channel, info_channel) // Show all stickies saved to a channel
     {
-        if (stickies.ValidStickyChannel(server_id, channel.id))
+        if (global.stickies.ValidStickyChannel(server_id, channel.id))
         {
             if (info_channel != null || channel.lastStickyTime == null || Date.now() - channel.lastStickyTime >= STICKY_COOLDOWN) // Wait a bit, we don't wanna interrupt conversations
             {
@@ -57,7 +56,7 @@ var exported = {
                 else
                     channel.lastStickyMessages.length = 0;
         
-                const stickyList = stickies.GetStickies(server_id, channel.id);
+                const stickyList = global.stickies.GetStickies(server_id, channel.id);
         
                 try
                 {
