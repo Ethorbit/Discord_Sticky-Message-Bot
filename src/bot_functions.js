@@ -18,7 +18,6 @@ var exported = {
         {
             const embed = new MessageEmbed();
             embed.color = Colors[color];
-            embed.title = global.discordApplication.name;
             embed.addField(title, message);
             channel.send(embed).then(sentMessage => {
                 if (typeof(cb) == "function") 
