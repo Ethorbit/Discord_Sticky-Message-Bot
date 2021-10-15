@@ -156,6 +156,7 @@ class Stickies
 
         if (this.stickies == null)
             return cb(false);
+
         if (this.stickies[server_id] && this.stickies[server_id][channel_id]) 
         {
             const ele = this.stickies[server_id][channel_id][sticky_id - 1];
@@ -182,6 +183,8 @@ class Stickies
             else
                 cb(false);
         }
+        else
+            cb(false);
     }
 
     RemoveChannelStickies(server_id, channel_id, cb) // Remove all stickies from a channel

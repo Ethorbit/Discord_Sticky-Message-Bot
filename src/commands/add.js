@@ -1,3 +1,4 @@
+// Add command
 const BotFunctions = require("../bot_functions.js");
 const Errors = require("../errors.js");
 

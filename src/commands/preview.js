@@ -1,3 +1,4 @@
+// Preview command
 const BotFunctions = require("../bot_functions.js");
 
 function Run(client, msg)
