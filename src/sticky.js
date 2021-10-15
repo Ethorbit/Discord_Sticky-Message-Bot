@@ -156,10 +156,15 @@ class Stickies
 
         if (this.stickies == null)
             return cb(false);
+
         if (this.stickies[server_id] && this.stickies[server_id][channel_id]) 
         {
             const ele = this.stickies[server_id][channel_id][sticky_id - 1];
+            if (!ele || !ele.message)
+                return cb(false);
+
             const deleted_message = ele.message;
+   
             if (ele != null && ele != -1)
             {   
                 this.stickies[server_id][channel_id].splice(sticky_id - 1, 1);
@@ -182,6 +187,8 @@ class Stickies
             else
                 cb(false);
         }
+        else
+            cb(false);
     }
 
     RemoveChannelStickies(server_id, channel_id, cb) // Remove all stickies from a channel
@@ -193,9 +200,11 @@ class Stickies
     
             this.stickies[server_id][channel_id].length = 0;
             db.run("DELETE FROM stickies WHERE server_id = ? AND channel_id = ?", [server_id, channel_id], (error) => {
-                cb();
+                cb(!error ? true : error.message);
             });
         }
+        else
+            cb(false);   
     }
 
     RemoveServerStickies(server_id, cb)
