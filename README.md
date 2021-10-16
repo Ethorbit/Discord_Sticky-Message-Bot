@@ -17,7 +17,7 @@ A bot that keeps important stuff at the bottom of channels.
 * `!sticky remove` `<channel id>` `<sticky id>` - Remove a sticky from a channel.
 * `!sticky removeall`   <channel id>` - Remove all stickies from a channel.
 * `!sticky preview` `<message>` - Preview what a sticky looks like.
-* `!sticky previewfancy` - Start the process of creating and previewing a fancy message.
+* `!sticky previewfancy` - Start the process of creating and previewing a fancy sticky.
 * `!sticky list` `<channel id>` - List stickies in a channel
 * `!sticky list` - List all channels with stickies
     
