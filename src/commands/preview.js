@@ -14,6 +14,7 @@ function Run(client, msg)
             BotFunctions.ShowChannelStickies(server_id, channel, msg.channel);
         }).catch(_ => {
             const originalMsg = msg.content.replace(msgParams[0], "").replace(msgParams[1], "");
+            
             msg.channel.send(originalMsg).then(sentMessage => {
                 sentMessage.suppressEmbeds(true);
             });
