@@ -15,11 +15,11 @@ function Run(client, msg)
         BotFunctions.ShowChannelStickies(server_id, channel, msg.channel);
     }).catch(_ => {
         if (channel_id != null)
-            return BotFunctions.SimpleMessage(msg.channel, Errors["invalid_channel"], "Error getting channel ID", "error");
+            return BotFunctions.SimpleMessage(msg.channel, Errors["invalid_channel"], "Error getting channel ID", Colors["error"]);
 
         const stickyList = global.stickies.GetStickies(server_id, null);
         if (typeof(stickyList) == "string")
-            return BotFunctions.SimpleMessage(msg.channel, stickyList, "Error listing stickies", "error");
+            return BotFunctions.SimpleMessage(msg.channel, stickyList, "Error listing stickies", Colors["error"]);
 
         const listEmbed = new MessageEmbed();
         listEmbed.color = Colors["info"];
@@ -46,7 +46,7 @@ function Run(client, msg)
                     if (array.length - 1 == index)
                     {
                         if (listEmbed.fields.length <= 0)
-                            BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", "error");
+                            BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", Colors["error"]);
                         else
                             msg.channel.send(listEmbed);
                     }
@@ -56,10 +56,10 @@ function Run(client, msg)
             });
 
             if (!bStickiesExist)
-                BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", "error");
+                BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", Colors["error"]);
         }
         else
-            BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", "error");
+            BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", Colors["error"]);
     }); 
 }
 

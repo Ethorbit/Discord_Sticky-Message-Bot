@@ -14,27 +14,94 @@ var exported = {
 
     SimpleMessage: function(channel, message, title, color, cb)
     {   
-        if (Colors[color] != null) 
+        const embed = new MessageEmbed();
+        embed.color = color;
+        embed.setTitle(title);
+        embed.setDescription(message);
+
+        channel.send(embed).then(sentMessage => {
+            if (typeof(cb) == "function") 
+                cb(sentMessage) 
+        });
+    },
+
+    WaitForUserResponse : function(channel, user, time, cb) // Wait for specific user to respond in specified channel, send result to callback
+    {
+        const collector = channel.createMessageCollector((m) => m.member == user, {time: time}).on("collect", (response) => {
+            cb(response);
+            collector.stop();
+        });
+    },
+
+    GetFancyMessagePropertiesFromUser: function(msg, cb) // Listen for user responses to get the fancy message properties we will use to add a fancy message
+    {
+        let hex_color;
+        let title;
+        let message;
+        let lastCollectorMsg;
+
+        try
         {
-            const embed = new MessageEmbed();
-            embed.color = Colors[color];
-            embed.title = global.discordApplication.name;
-            embed.addField(title, message);
-            channel.send(embed).then(sentMessage => {
-                if (typeof(cb) == "function") 
-                { 
-                    cb(sentMessage) 
+            this.SimpleMessage(msg.channel, "What hex color you want? Example: #FFF68F (There are plenty of online tools to get that)", "What Color?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
+            
+            let step = 0;
+            const collectorFilter = (m) => m.member == msg.member;
+            const collector = msg.channel.createMessageCollector(collectorFilter, {time: 600000}).on("collect", (response) => {
+                step++;
+
+                if (step == 1)
+                {
+                    this.DeleteMessage(lastCollectorMsg);
+                    hex_color = response.content;
+                    this.SimpleMessage(msg.channel, "What should the title be?", "What Title?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
+                }
+
+                if (step == 2)
+                {
+                    this.DeleteMessage(lastCollectorMsg);
+                    title = response.content;
+                    this.SimpleMessage(msg.channel, "What should the message be?", "What Message?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
+                }
+
+                if (step == 3)
+                {
+                    this.DeleteMessage(lastCollectorMsg);
+                    message = response.content;    
+                    cb(hex_color, title, message);
+                    collector.stop();
                 }
             });
         }
-        else
-            console.error("Invalid color specified!");
+        catch (error)
+        {
+            console.error(error);
+        }
     },
 
     GetMessageChannelID: function(message)
     {
         if (typeof(message) != "string") return;
         return message.replace("#", "").replace("<", "").replace(">", "");
+    },
+
+    SendStickyMessage: function(channel, sticky, cb)
+    {
+        if (sticky["is_embed"])
+        {
+            this.SimpleMessage(channel, sticky["message"], sticky["title"], sticky["hex_color"], (sentMessage) => {
+                if (typeof(cb) == "function")
+                    cb(sentMessage);
+            });
+        }
+        else
+        {
+            channel.send(sticky["message"]).then(sentMessage => {
+                sentMessage.suppressEmbeds(true);
+
+                if (typeof(cb) == "function")
+                    cb(sentMessage);
+            });
+        }
     },
 
     ShowChannelStickies: function(server_id, channel, info_channel) // Show all stickies saved to a channel
@@ -74,16 +141,14 @@ var exported = {
                             if (info_channel == null)
                                 channel.lastStickyTime = Date.now();
 
-                            sendChannel.send(val["message"]).then(sentMessage => {
-                                sentMessage.suppressEmbeds(true);
-
+                            this.SendStickyMessage(sendChannel, val, (sentMessage) => {
                                 if (info_channel == null)
                                     channel.lastStickyMessages.push(sentMessage);
                             });
                         });
                     }
                     else if (info_channel != null)
-                        this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", "error");
+                        this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", Colors["error"]);
                 }
                 catch (error)
                 {
@@ -97,7 +162,7 @@ var exported = {
             }
         }
         else if (info_channel != null)
-            this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", "error");
+            this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", Colors["error"]);
     }
 };
 

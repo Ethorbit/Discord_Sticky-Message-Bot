@@ -20,7 +20,18 @@ let dbOpened = false;
                         return console.error(error.message);
 
                     if (value == null) // Table doesn't exist, create it
-                        db.run("CREATE TABLE stickies(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, server_id TEXT NOT NULL, channel_id TEXT NOT NULL, sticky_id INTEGER NOT NULL, message TEXT NOT NULL)");
+                        db.run(`CREATE TABLE 
+                                    stickies(
+                                        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
+                                        server_id TEXT NOT NULL, 
+                                        channel_id TEXT NOT NULL, 
+                                        sticky_id INTEGER NOT NULL, 
+                                        title TEXT,
+                                        message TEXT NOT NULL, 
+                                        hex_color TEXT DEFAULT "#FFF68F",
+                                        is_embed BOOL DEFAULT FALSE
+                                    )`
+                            );
                 });
             });
         }  
@@ -95,19 +106,23 @@ class Stickies
             const server_id = value.server_id;
             const channel_id = value.channel_id;
             const sticky_id = value.sticky_id;
+            const title = value.title;
             const message = value.message;
+            const hex_color = value.hex_color;
+            const is_embed = value.is_embed;
+
             if (server_id != null && channel_id != null && sticky_id != null && message != null)
             {
                 this.InitStickies(server_id, channel_id);
-                this.stickies[server_id][channel_id][sticky_id - 1] = new Object({"server_id" : server_id, "channel_id" : channel_id, "message" : message});
+                this.stickies[server_id][channel_id][sticky_id - 1] = new Object({"server_id" : server_id, "channel_id" : channel_id, "title" : title, "message" : message, "hex_color" : hex_color, "is_embed" : is_embed});
             }
         }, () => {
             cb();
         });
     }
 
-    AddSticky(server_id, channel_id, message, cb) // Add sticky to sticky array and database stickies
-    {   
+    TryAddSticky(cb, server_id, channel_id)
+    {
         if (db == null || !dbOpened)
             return cb(DB_ERROR);
 
@@ -115,17 +130,40 @@ class Stickies
             return cb(false);
 
         this.InitStickies(server_id, channel_id);
+    }
+
+    GetStickyCount(server_id, channel_id)
+    {
+        return this.stickies[server_id][channel_id].length + 1;
+    }
+
+    AddSticky(server_id, channel_id, message, cb) // Add sticky to sticky array and database stickies
+    {   
+        this.TryAddSticky(cb, server_id, channel_id);
           
-        let stickyCount = this.stickies[server_id][channel_id].length + 1;
-        db.run("INSERT INTO stickies VALUES(NULL, ?, ?, ?, ?)", [server_id, channel_id, stickyCount, message], (error) => {
+        let stickyCount = this.GetStickyCount(server_id, channel_id);
+        db.run("INSERT INTO stickies VALUES(NULL, ?, ?, ?, ?, ?, ?, FALSE)", [server_id, channel_id, stickyCount, null, message, null], (error) => {
             if (error)
                 cb(`Database action to insert a new value failed. (${error})`);
             else
-                cb(this.stickies[server_id][channel_id].push(new Object({"server_id" : server_id, "channel_id" : channel_id, "message" : message})));
+                cb(this.stickies[server_id][channel_id].push(new Object({"server_id" : server_id, "channel_id" : channel_id, "title" : null, "message" : message, "hex_color" : null, "is_embed" : false})));
         });
     }
 
-    EditSticky(server_id, channel_id, sticky_id, discord_message, cb) // Modify existing sticky in channel
+    AddFancySticky(server_id, channel_id, title, message, hex_color, cb) // Add sticky to sticky array and database stickies
+    {   
+        this.TryAddSticky(cb, server_id, channel_id);
+          
+        let stickyCount = this.GetStickyCount(server_id, channel_id);
+        db.run("INSERT INTO stickies VALUES(NULL, ?, ?, ?, ?, ?, ?, TRUE)", [server_id, channel_id, stickyCount, title, message, hex_color], (error) => {
+            if (error)
+                cb(`Database action to insert a new value failed. (${error})`);
+            else
+                cb(this.stickies[server_id][channel_id].push(new Object({"server_id" : server_id, "channel_id" : channel_id, "title" : title, "message" : message, "hex_color" : hex_color, "is_embed" : true})));
+        });
+    }
+
+    EditSticky(server_id, channel_id, sticky_id, key, value, cb) // Modify existing sticky in channel by key
     {
         if (db == null || !dbOpened)
             return cb(DB_ERROR);
@@ -135,9 +173,15 @@ class Stickies
 
         if (this.stickies[server_id] && this.stickies[server_id][channel_id] && this.stickies[server_id][channel_id][sticky_id - 1])
         {
-            this.stickies[server_id][channel_id][sticky_id - 1].message = discord_message;
-            db.run("UPDATE stickies SET message = ? WHERE server_id = ? AND channel_id = ? AND sticky_id = ?", 
-                [discord_message, server_id, channel_id, sticky_id], (error) => {
+            this.stickies[server_id][channel_id][sticky_id - 1][key] = value;
+
+           // if (key == "is_embed") value = (value == "true");
+
+            if (key == "title" || key == "hex_color") 
+                this.EditSticky(server_id, channel_id, sticky_id, "is_embed", true); // If they're editing embed functionality; this needs to be converted to an embed or they won't see their edits.
+
+            db.run(`UPDATE stickies SET ${key} = ? WHERE server_id = ? AND channel_id = ? AND sticky_id = ?`, 
+                [value, server_id, channel_id, sticky_id], (error) => {
                     if (error != null)
                         return cb(error.message);
                     else
@@ -221,6 +265,11 @@ class Stickies
     ValidStickyChannel(server_id, channel_id)
     {
         return this.stickies != null && this.stickies[server_id] != null && this.stickies[server_id][channel_id] != null;
+    }
+
+    ValidSticky(server_id, channel_id, sticky_id)
+    {
+        return this.ValidStickyChannel(server_id, channel_id) && this.stickies[server_id][channel_id][sticky_id - 1] != null;
     }
 
     GetStickies(server_id, channel_id) // Without channel_id, get all channels that have stickies, otherwise get all stickies in channel

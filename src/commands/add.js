@@ -1,6 +1,7 @@
 // Add command
 const BotFunctions = require("../bot_functions.js");
 const Errors = require("../errors.js");
+const Colors = require("../colors.js");
 
 function Run(client, msg)
 {
@@ -11,16 +12,16 @@ function Run(client, msg)
 
     client.channels.fetch(channel_id).then(channel => {
         if (channel.type != "text") 
-            return BotFunctions.SimpleMessage(msg.channel, "The passed channel must be a text channel that you can post messages in.", "Incorrect channel type!", "error");
+            return BotFunctions.SimpleMessage(msg.channel, "The passed channel must be a text channel that you can post messages in.", "Incorrect channel type!", Colors["error"]);
 
         if (originalMsg.replace(" ", "").length <= 1)
-            BotFunctions.SimpleMessage(msg.channel, "You need to pass a Discord message (!sticky add 798815345905106945 This is the missing message :D)", "No message passed!", "error");
+            BotFunctions.SimpleMessage(msg.channel, Errors["invalid_message"], "No message passed!", Colors["error"]);
         else
         {
-            BotFunctions.SimpleMessage(msg.channel, "Please wait while I add the sticky..", "Processing", "sticky", (sentMessage) => {
+            BotFunctions.SimpleMessage(msg.channel, "Please wait while I add the sticky..", "Processing", Colors["sticky"], (sentMessage) => {
                 global.stickies.AddSticky(server_id, channel_id, originalMsg, (val) => {
                     if (typeof(val) == "string")
-                        return BotFunctions.SimpleMessage(msg.channel, val, "Error adding sticky!", "error", () => BotFunctions.DeleteMessage(sentMessage));
+                        return BotFunctions.SimpleMessage(msg.channel, val, "Error adding sticky!", Colors["error"], () => BotFunctions.DeleteMessage(sentMessage));
 
                     if (val)
                     {
@@ -34,12 +35,12 @@ function Run(client, msg)
                         });
                     }
                     else
-                        BotFunctions.SimpleMessage(msg.channel, "Unknown error, try again.", "Error adding sticky!", "error", BotFunctions.DeleteMessage(sentMessage));
+                        BotFunctions.SimpleMessage(msg.channel, "Unknown error, try again.", "Error adding sticky!", Colors["error"], BotFunctions.DeleteMessage(sentMessage));
                 });
             });
         }
     }).catch(_ => {
-        BotFunctions.SimpleMessage(msg.channel, Errors["invalid_channel"], "Error getting channel ID", "error");
+        BotFunctions.SimpleMessage(msg.channel, Errors["invalid_channel"], "Error getting channel ID", Colors["error"]);
     });
 }
 

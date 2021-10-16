@@ -4,10 +4,12 @@ const BotFunctions = require("./bot_functions.js");
 const Colors = require("./colors.js");
 
 const AddCommand = require("./commands/add.js");
+const AddFancyCommand = require("./commands/addfancy.js");
 const EditCommand = require("./commands/edit.js");
 const RemoveCommand = require("./commands/remove.js");
 const RemoveAllCommand = require("./commands/removeall.js");
 const PreviewCommand = require("./commands/preview.js");
+const PreviewFancyCommand = require("./commands/previewfancy.js");
 const ListCommand = require("./commands/list.js");
 
 const { Client, MessageEmbed } = require("discord.js");
@@ -77,7 +79,7 @@ client.on("message", msg => {
     {   
         if (!msg.member.hasPermission("MANAGE_CHANNELS"))
         {
-            BotFunctions.SimpleMessage(msg.channel, "You need the 'Manage Channels' permission.", "Insufficient Privileges!", "error");
+            BotFunctions.SimpleMessage(msg.channel, "You need the 'Manage Channels' permission.", "Insufficient Privileges!", Colors["error"]);
             return; 
         }
 
@@ -85,6 +87,9 @@ client.on("message", msg => {
         {
             case "add": // Add a sticky
                 AddCommand.Run(client, msg);
+            break;
+            case "addfancy": // Add a fancy sticky
+                AddFancyCommand.Run(client, msg);
             break;
             case "edit": // Modify channel sticky
                 EditCommand.Run(client, msg);
@@ -98,23 +103,26 @@ client.on("message", msg => {
             case "preview":
                 PreviewCommand.Run(client, msg);
             break;
+            case "previewfancy":
+                PreviewFancyCommand.Run(client, msg);
+            break;
             case "list": // List stickies from channel or all channels with stickies
                 ListCommand.Run(client, msg);
             break;
             default:
                 const embed = new MessageEmbed();
                 embed.color = Colors["info"];
-                embed.title = global.discordApplication.name;
+                embed.title = "Commands";
 
-                embed.addField("Commands", `
-                    !sticky add <channel id> <discord message> - Add a sticky to a channel
-                    !sticky edit <channel id> <sticky id> <discord message> - Change sticky message
-                    !sticky remove <channel id> <sticky id> - Remove a sticky from a channel
-                    !sticky removeall <channel id> - Remove all stickies from a channel
-                    !sticky preview <discord message> - Preview what a sticky looks like
-                    !sticky list <channel id> - List stickies in a channel
-                    !sticky list - List all channels with stickies
-                `);
+                embed.addField("!sticky add <channel id> <discord message>", "Add a sticky to a channel.");
+                embed.addField("!sticky addfancy <channel id>", "Start the process of adding a fancy message to a channel.");
+                embed.addField("!sticky edit <channel id> <sticky id>", "Modify an existing sticky's property.");
+                embed.addField("!sticky remove <channel id> <sticky id>", "Remove a sticky from a channel.");
+                embed.addField("!sticky removeall <channel id>", "Remove all stickies from a channel.");
+                embed.addField("!sticky preview <message>", "Preview what a sticky looks like.");
+                embed.addField("!sticky previewfancy", "Start the process of creating and previewing a fancy message.");
+                embed.addField("!sticky list <channel id>", "List stickies in a channel");
+                embed.addField("!sticky list", "List all channels with stickies"); 
 
                 msg.channel.send(embed);
         }
