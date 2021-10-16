@@ -35,9 +35,9 @@ client.on("ready", () => {
                             {
                                 if (message.author.bot && message.author.id == global.discordApplication.id)
                                 {
-                                    // Only remove sticky messages (So commands stay visible)
-                                    if (message.embeds[0] == null)
-                                        BotFunctions.DeleteMessage(message);
+                                    //// Only remove sticky messages (So commands stay visible)
+                                    //if (message.embeds[0] == null)
+                                    BotFunctions.DeleteMessage(message);
                                 }
                             }
                         }).then(() => {
