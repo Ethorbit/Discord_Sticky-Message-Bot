@@ -1,5 +1,5 @@
 # Discord_Sticky-Message-Bot
-A bot that keeps important stuff at the bottom of channels
+A bot that keeps important stuff at the bottom of channels.
 
 ## Features
 * Unlike the others, EVERYTHING'S FREE!!
@@ -11,14 +11,15 @@ A bot that keeps important stuff at the bottom of channels
 ![Example Image](https://i.imgur.com/2RUZb2q.png)
 
 ### Commands:
-    !sticky add <channel id> <discord message> - Add a sticky to a channel
-    !sticky edit <channel id> <sticky id> <discord message> - Edit existing sticky from a channel
-    !sticky remove <channel id> <sticky id> - Remove a sticky from a channel
-    !sticky removeall <channel id> - Remove all stickies from a channel
-    !sticky preview <discord message> - Preview what a sticky looks like
-    !sticky list <channel id> - List stickies in a channel
-    !sticky list - List all channels with stickies
-    !sticky - List all commands
+* !sticky add <channel id> <discord message> - Add a sticky to a channel.
+* !sticky addfancy <channel id> - Start the process of adding a fancy message (embed) to a channel.
+* !sticky edit <channel id> <sticky id> - Modify an existing sticky's property.
+* !sticky remove <channel id> <sticky id> - Remove a sticky from a channel.
+* !sticky removeall <channel id> - Remove all stickies from a channel.
+* !sticky preview <message> - Preview what a sticky looks like.
+* !sticky previewfancy - Start the process of creating and previewing a fancy message.
+* !sticky list <channel id> - List stickies in a channel
+* !sticky list - List all channels with stickies
     
 # Installation
 ### Environment Variables
