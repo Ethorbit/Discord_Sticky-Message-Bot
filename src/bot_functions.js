@@ -18,7 +18,9 @@ var exported = {
         {
             const embed = new MessageEmbed();
             embed.color = Colors[color];
-            embed.addField(title, message);
+            embed.setTitle(title);
+            embed.setDescription(message);
+            
             channel.send(embed).then(sentMessage => {
                 if (typeof(cb) == "function") 
                 { 
