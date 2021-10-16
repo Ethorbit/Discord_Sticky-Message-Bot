@@ -3,7 +3,7 @@ const STICKY_COOLDOWN = isNaN(parseInt(process.env.STICKY_COOLDOWN)) ? 20000 : p
 const Errors = require("./errors.js");
 const Colors = require("./colors.js");
 
-const { MessageEmbed, Message, Channel } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 
 var exported = {
     DeleteMessage: function(message)
@@ -25,7 +25,7 @@ var exported = {
         });
     },
 
-    WaitForUserResponse : function(channel, user, time, cb)
+    WaitForUserResponse : function(channel, user, time, cb) // Wait for specific user to respond in specified channel, send result to callback
     {
         const collector = channel.createMessageCollector((m) => m.member == user, {time: time}).on("collect", (response) => {
             cb(response);

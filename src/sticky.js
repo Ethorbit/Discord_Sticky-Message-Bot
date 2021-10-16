@@ -173,7 +173,9 @@ class Stickies
 
         if (this.stickies[server_id] && this.stickies[server_id][channel_id] && this.stickies[server_id][channel_id][sticky_id - 1])
         {
-            this.stickies[server_id][channel_id][sticky_id - 1].key = value;
+            this.stickies[server_id][channel_id][sticky_id - 1][key] = value;
+
+           // if (key == "is_embed") value = (value == "true");
 
             if (key == "title" || key == "hex_color") 
                 this.EditSticky(server_id, channel_id, sticky_id, "is_embed", true); // If they're editing embed functionality; this needs to be converted to an embed or they won't see their edits.
