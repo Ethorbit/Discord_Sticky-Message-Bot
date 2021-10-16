@@ -116,7 +116,7 @@ client.on("message", msg => {
 
                 embed.addField("!sticky add <channel id> <discord message>", "Add a sticky to a channel.");
                 embed.addField("!sticky addfancy <channel id>", "Start the process of adding a fancy message to a channel.");
-                embed.addField("!sticky edit <channel id> <sticky id>", "Modify an existing sticky's property.");
+                embed.addField("!sticky edit <channel id> <sticky id>", "Start the modification process for the provided sticky.");
                 embed.addField("!sticky remove <channel id> <sticky id>", "Remove a sticky from a channel.");
                 embed.addField("!sticky removeall <channel id>", "Remove all stickies from a channel.");
                 embed.addField("!sticky preview <message>", "Preview what a sticky looks like.");
