@@ -34,6 +34,6 @@ Instantly deploy on a server using Docker: https://hub.docker.com/r/ethorbit/dis
 
 ## Bot Permissions
 This bot needs:
-* Read Messages & History
+* Read Message History
 * Send Messages
 * Manage Messages
