@@ -15,8 +15,13 @@ var exported = {
     SimpleMessage: function(channel, message, title, color, cb)
     {   
         const embed = new MessageEmbed();
-        embed.color = color;
-        embed.setTitle(title);
+
+        if (color != undefined)
+            embed.color = color;
+            
+        if (title != undefined)
+            embed.setTitle(title);
+
         embed.setDescription(message);
 
         channel.send(embed).then(sentMessage => {
@@ -42,7 +47,7 @@ var exported = {
 
         try
         {
-            this.SimpleMessage(msg.channel, "What hex color you want? Example: #FFF68F (There are plenty of online tools to get that)", "What Color?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
+            this.SimpleMessage(msg.channel, "What hex color you want? Example: #FFF68F (There are plenty of online tools to get that. Enter nocolor to use default.)", "What Color?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
             
             let step = 0;
             const collectorFilter = (m) => m.member == msg.member;
@@ -52,14 +57,17 @@ var exported = {
                 if (step == 1)
                 {
                     this.DeleteMessage(lastCollectorMsg);
-                    hex_color = response.content;
-                    this.SimpleMessage(msg.channel, "What should the title be?", "What Title?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
+                    hex_color = response.content != "nocolor" ? response.content : "#FFF043";
+                    this.SimpleMessage(msg.channel, "What should the title be? (Enter notitle to skip)", "What Title?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
                 }
 
                 if (step == 2)
                 {
                     this.DeleteMessage(lastCollectorMsg);
-                    title = response.content;
+
+                    if (response.content != "notitle")
+                        title = response.content;
+
                     this.SimpleMessage(msg.channel, "What should the message be?", "What Message?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
                 }
 
