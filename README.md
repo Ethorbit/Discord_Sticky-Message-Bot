@@ -11,15 +11,15 @@ A bot that keeps important stuff at the bottom of channels.
 ![Example Image](https://i.imgur.com/2RUZb2q.png)
 
 ### Commands:
-* !sticky add \<channel id\> <discord message> - Add a sticky to a channel.
-* !sticky addfancy \<channel id\> - Start the process of adding a fancy message (embed) to a channel.
-* !sticky edit \<channel id\> \<sticky id\> - Start the modification process for the provided sticky.
-* !sticky remove \<channel id\> \<sticky id\> - Remove a sticky from a channel.
-* !sticky removeall \<channel id\> - Remove all stickies from a channel.
-* !sticky preview \<message\> - Preview what a sticky looks like.
-* !sticky previewfancy - Start the process of creating and previewing a fancy message.
-* !sticky list \<channel id\> - List stickies in a channel
-* !sticky list - List all channels with stickies
+* `!sticky add` `<channel id>` `<discord message>` - Add a sticky to a channel.
+* `!sticky addfancy` `<channel id>` - Start the process of adding a fancy sticky (embed) to a channel.
+* `!sticky edit` `<channel id>` `<sticky id>` - Start the modification process for the provided sticky.
+* `!sticky remove` `<channel id>` `<sticky id>` - Remove a sticky from a channel.
+* `!sticky removeall`   <channel id>` - Remove all stickies from a channel.
+* `!sticky preview` `<message>` - Preview what a sticky looks like.
+* `!sticky previewfancy` - Start the process of creating and previewing a fancy sticky.
+* `!sticky list` `<channel id>` - List stickies in a channel
+* `!sticky list` - List all channels with stickies
     
 # Installation
 ### Environment Variables
@@ -34,6 +34,6 @@ Instantly deploy on a server using Docker: https://hub.docker.com/r/ethorbit/dis
 
 ## Bot Permissions
 This bot needs:
-* Read Messages & History
+* Read Message History
 * Send Messages
 * Manage Messages
