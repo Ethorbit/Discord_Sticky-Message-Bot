@@ -165,32 +165,36 @@ class Stickies
 
     EditSticky(server_id, channel_id, sticky_id, key, value, cb) // Modify existing sticky in channel by key
     {
+        const valid_cb = (typeof(cb) == "function");
+        
         if (db == null || !dbOpened)
-            return cb(DB_ERROR);
+            return valid_cb && cb(DB_ERROR);
 
         if (this.stickies == null)
-            return cb(false);
+            return valid_cb && cb(false);
 
         if (this.stickies[server_id] && this.stickies[server_id][channel_id] && this.stickies[server_id][channel_id][sticky_id - 1])
         {
-            this.stickies[server_id][channel_id][sticky_id - 1][key] = value;
-
-           // if (key == "is_embed") value = (value == "true");
+            const sticky = this.stickies[server_id][channel_id][sticky_id - 1];
+            sticky[key] = value;
 
             if (key == "title" || key == "hex_color") 
                 this.EditSticky(server_id, channel_id, sticky_id, "is_embed", true); // If they're editing embed functionality; this needs to be converted to an embed or they won't see their edits.
 
+            // if (sticky["hex_color"] == null && sticky["title"] == null)
+            //     this.EditSticky(server_id, channel_id, sticky_id, "is_embed", false);
+
             db.run(`UPDATE stickies SET ${key} = ? WHERE server_id = ? AND channel_id = ? AND sticky_id = ?`, 
                 [value, server_id, channel_id, sticky_id], (error) => {
                     if (error != null)
-                        return cb(error.message);
+                        return valid_cb && cb(error.message);
                     else
-                        return cb(true);
+                        return valid_cb && cb(true);
                 }
             );
         }
         else
-            cb(false);
+            return valid_cb && cb(false);
     }
 
     RemoveSticky(server_id, channel_id, sticky_id, cb) // Remove specific sticky 

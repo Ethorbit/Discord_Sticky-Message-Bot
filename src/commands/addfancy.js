@@ -1,7 +1,8 @@
 // Add Fancy command
+const FancyFunctions = require("../messages/fancy_functions");
 const BotFunctions = require("../bot_functions.js");
-const Errors = require("../errors.js");
-const Colors = require("../colors.js");
+const Errors = require("../messages/errors.js");
+const Colors = require("../messages/colors.js");
 
 function Run(client, msg)
 {
@@ -13,7 +14,7 @@ function Run(client, msg)
         if (channel.type != "text") 
             return BotFunctions.SimpleMessage(msg.channel, "The passed channel must be a text channel that you can post messages in.", "Incorrect channel type!", Colors["error"]);
         
-        BotFunctions.GetFancyMessagePropertiesFromUser(msg, (hex_color, title, message) => {
+        FancyFunctions.GetMessagePropertiesFromUser(msg, (hex_color, title, message) => {
             global.stickies.AddFancySticky(server_id, channel_id, title, message, hex_color, (val) => { 
                 if (typeof(val) == "string")
                     return BotFunctions.SimpleMessage(msg.channel, val, "Error adding sticky!", Colors["error"]);
@@ -32,7 +33,7 @@ function Run(client, msg)
                     BotFunctions.SimpleMessage(msg.channel, "Unknown error, try again.", "Error adding sticky!", Colors["error"]);
             });
         });
-    }).catch(error => {
+    }).catch(_ => {
         BotFunctions.SimpleMessage(msg.channel, Errors["invalid_channel"], "Error getting channel ID", Colors["error"]);
     });
 }

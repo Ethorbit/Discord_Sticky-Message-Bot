@@ -1,7 +1,6 @@
+const Errors = require("./messages/errors.js");
+const Colors = require("./messages/colors.js");
 const STICKY_COOLDOWN = isNaN(parseInt(process.env.STICKY_COOLDOWN)) ? 20000 : process.env.STICKY_COOLDOWN; 
-
-const Errors = require("./errors.js");
-const Colors = require("./colors.js");
 
 const { MessageEmbed } = require("discord.js");
 
@@ -18,7 +17,7 @@ var exported = {
 
         if (color != undefined)
             embed.color = color;
-            
+
         if (title != undefined)
             embed.setTitle(title);
 
@@ -38,54 +37,6 @@ var exported = {
         });
     },
 
-    GetFancyMessagePropertiesFromUser: function(msg, cb) // Listen for user responses to get the fancy message properties we will use to add a fancy message
-    {
-        let hex_color;
-        let title;
-        let message;
-        let lastCollectorMsg;
-
-        try
-        {
-            this.SimpleMessage(msg.channel, "What hex color you want? Example: #FFF68F (There are plenty of online tools to get that. Enter nocolor to use default.)", "What Color?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
-            
-            let step = 0;
-            const collectorFilter = (m) => m.member == msg.member;
-            const collector = msg.channel.createMessageCollector(collectorFilter, {time: 600000}).on("collect", (response) => {
-                step++;
-
-                if (step == 1)
-                {
-                    this.DeleteMessage(lastCollectorMsg);
-                    hex_color = response.content != "nocolor" ? response.content : "#FFF043";
-                    this.SimpleMessage(msg.channel, "What should the title be? (Enter notitle to skip)", "What Title?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
-                }
-
-                if (step == 2)
-                {
-                    this.DeleteMessage(lastCollectorMsg);
-
-                    if (response.content != "notitle")
-                        title = response.content;
-
-                    this.SimpleMessage(msg.channel, "What should the message be?", "What Message?", Colors["question"], sentMessage => lastCollectorMsg = sentMessage);
-                }
-
-                if (step == 3)
-                {
-                    this.DeleteMessage(lastCollectorMsg);
-                    message = response.content;    
-                    cb(hex_color, title, message);
-                    collector.stop();
-                }
-            });
-        }
-        catch (error)
-        {
-            console.error(error);
-        }
-    },
-
     GetMessageChannelID: function(message)
     {
         if (typeof(message) != "string") return;
@@ -96,7 +47,7 @@ var exported = {
     {
         if (sticky["is_embed"])
         {
-            this.SimpleMessage(channel, sticky["message"], sticky["title"], sticky["hex_color"], (sentMessage) => {
+            this.SimpleMessage(channel, sticky["message"], sticky["title"], sticky["hex_color"], sentMessage => {
                 if (typeof(cb) == "function")
                     cb(sentMessage);
             });
@@ -118,6 +69,7 @@ var exported = {
         {
             if (info_channel != null || channel.lastStickyTime == null || Date.now() - channel.lastStickyTime >= STICKY_COOLDOWN) // Wait a bit, we don't wanna interrupt conversations
             {
+                // Delete previous sticky messages we posted
                 if (info_channel == null && channel.lastStickyMessages != null)
                 {
                     channel.lastStickyMessages.forEach((val) => {

@@ -1,7 +1,7 @@
 // Add command
 const BotFunctions = require("../bot_functions.js");
-const Errors = require("../errors.js");
-const Colors = require("../colors.js");
+const Errors = require("../messages/errors.js");
+const Colors = require("../messages/colors.js");
 
 function Run(client, msg)
 {
