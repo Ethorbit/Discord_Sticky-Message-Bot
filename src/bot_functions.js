@@ -21,8 +21,13 @@ var exported = {
         if (title != undefined)
             embed.setTitle(title);
 
-        embed.setDescription(message);
-
+        // Stupid workaround thanks to discord.js not supporting more than 1 single space inside embeds
+        // My god, please someone get them to fix this..
+        const fake_space = " ឵឵  ឵឵";
+        const discordjs_not_doing_its_job = message.replace(/([^\S\r\n][^\S\r\n])/gm, fake_space);
+       
+        embed.setDescription(discordjs_not_doing_its_job); 
+        
         channel.send(embed).then(sentMessage => {
             if (typeof(cb) == "function") 
                 cb(sentMessage) 
