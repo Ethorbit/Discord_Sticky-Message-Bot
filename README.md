@@ -1,3 +1,4 @@
+[![build](https://github.com/Ethorbit/Discord_Sticky-Message-Bot/actions/workflows/docker-image.yml/badge.svg)](https://github.com/Ethorbit/Discord_Sticky-Message-Bot/actions/workflows/docker-image.yml)
 # Discord_Sticky-Message-Bot
 A bot that keeps important stuff at the bottom of channels.
 
