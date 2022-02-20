@@ -1,4 +1,3 @@
-[![build](https://github.com/Ethorbit/Discord_Sticky-Message-Bot/actions/workflows/docker-image.yml/badge.svg)](https://github.com/Ethorbit/Discord_Sticky-Message-Bot/actions/workflows/docker-image.yml)
 # Discord_Sticky-Message-Bot
 A bot that keeps important stuff at the bottom of channels.
 
@@ -28,6 +27,8 @@ A bot that keeps important stuff at the bottom of channels.
 * STICKY_COOLDOWN - How many milliseconds a channel's sticky cooldown lasts
 
 ## ![DockerHub](https://i.imgur.com/tItmtNW.png) Docker
+[![build](https://github.com/Ethorbit/Discord_Sticky-Message-Bot/actions/workflows/docker-image.yml/badge.svg)](https://github.com/Ethorbit/Discord_Sticky-Message-Bot/actions/workflows/docker-image.yml)
+
 Instantly deploy on a server using Docker: https://hub.docker.com/r/ethorbit/discord_sticky-message-bot
 > docker run -dit -e BOT_TOKEN="MyToken" -e STICKY_COOLDOWN="20000" --name sticky-bot ethorbit/discord_sticky-message-bot:linux
 
