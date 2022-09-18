@@ -1,4 +1,5 @@
-require('dotenv').config({path: "../.env"});
+const findConfig = require("find-config");
+require("dotenv").config({path: findConfig(".env")});
 
 const BotFunctions = require("./bot_functions.js");
 const Colors = require("./messages/colors.js");
