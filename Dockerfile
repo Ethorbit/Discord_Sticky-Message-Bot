@@ -6,6 +6,8 @@ ENV STICKY_COOLDOWN ""
 WORKDIR /home/stickybot
 
 RUN apk update &&\
+    apk add ca-certificates &&\
+    update-ca-certificates &&\
     addgroup -g 6969 -S stickybot &&\
     adduser -S -u 6969 -h /home/stickybot stickybot
 
