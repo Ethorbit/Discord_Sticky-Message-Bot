@@ -1,9 +1,12 @@
 FROM node:12.20.1-alpine3.12
 
-ENV BOT_TOKEN ""
-ENV STICKY_COOLDOWN ""
+ENV BRANCH="main"
+ENV BOT_TOKEN=""
+ENV STICKY_COOLDOWN=""
 
 WORKDIR /home/stickybot
+VOLUME /botdb
+ENV BOT_DB_PATH="/botdb"
 
 RUN apk update &&\
     apk add ca-certificates &&\
@@ -13,7 +16,7 @@ RUN apk update &&\
 
 USER stickybot
 
-RUN wget -q "https://github.com/Ethorbit/Discord_Sticky-Message-Bot/archive/main.zip" -O "./project.zip" &&\
+RUN wget -q "https://github.com/Ethorbit/Discord_Sticky-Message-Bot/archive/${BRANCH}.zip" -O "./project.zip" &&\
     mkdir ./project &&\
     unzip ./project.zip -d ./project && rm ./project.zip && cd ./project &&\
     mv "./Discord_Sticky-Message-Bot-main" "./bot" && cd "./bot" &&\
