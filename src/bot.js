@@ -71,9 +71,12 @@ client.on("guildDelete", guild => {
 });
 
 client.on("message", msg => {
-    if (msg.author.bot)
+    // Originally it was gonna ignore all bots, but it probably makes more sense to just ignore itself
+    //    if (msg.author.bot)
+    //        return;
+    if (msg.author.bot && msg.author.id == global.discordApplication.id)
         return;
-
+    
     const msgParams = msg.content.toLowerCase().split(" ");
     
     if (msgParams[0] == "!sticky")
