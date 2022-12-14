@@ -1,6 +1,6 @@
-FROM node:12.20.1-alpine3.12
+FROM node:16.19.0-alpine3.17
+ARG GIT_BRANCH="main"
 
-ENV BRANCH="main"
 ENV BOT_TOKEN=""
 ENV STICKY_COOLDOWN=""
 
@@ -16,10 +16,10 @@ RUN apk update &&\
 
 USER stickybot
 
-RUN wget -q "https://github.com/Ethorbit/Discord_Sticky-Message-Bot/archive/${BRANCH}.zip" -O "./project.zip" &&\
+RUN wget -q "https://github.com/Ethorbit/Discord_Sticky-Message-Bot/archive/${GIT_BRANCH}.zip" -O "./project.zip" &&\
     mkdir ./project &&\
     unzip ./project.zip -d ./project && rm ./project.zip && cd ./project &&\
-    mv "./Discord_Sticky-Message-Bot-main" "./bot" && cd "./bot" &&\
+    mv "./Discord_Sticky-Message-Bot-${GIT_BRANCH}" "./bot" && cd "./bot" &&\
     npm install
 
 RUN chmod -R 700 ./
