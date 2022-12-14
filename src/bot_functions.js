@@ -2,7 +2,7 @@ const Errors = require("./messages/errors.js");
 const Colors = require("./messages/colors.js");
 const STICKY_COOLDOWN = isNaN(parseInt(process.env.STICKY_COOLDOWN)) ? 20000 : process.env.STICKY_COOLDOWN; 
 
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 
 var exported = {
     DeleteMessage: function(message)
@@ -13,10 +13,10 @@ var exported = {
 
     SimpleMessage: function(channel, message, title, color, cb)
     {   
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
         if (color != undefined)
-            embed.color = color;
+            embed.setColor(color);
 
         if (title != undefined)
             embed.setTitle(title);
@@ -28,7 +28,7 @@ var exported = {
        
         embed.setDescription(discordjs_not_doing_its_job); 
         
-        channel.send(embed).then(sentMessage => {
+        channel.send({embeds: [embed]}).then(sentMessage => {
             if (typeof(cb) == "function") 
                 cb(sentMessage) 
         });
@@ -98,9 +98,9 @@ var exported = {
                             const sendChannel = info_channel != null ? info_channel : channel;
                             if (info_channel != null)
                             {
-                                const stickyEmbed = new MessageEmbed();
-                                stickyEmbed.title =  `Sticky #${index + 1}`;
-                                sendChannel.send(stickyEmbed);
+                                const stickyEmbed = new EmbedBuilder();
+                                stickyEmbed.setTitle(`Sticky #${index + 1}`);
+                                sendChannel.send({embeds: [stickyEmbed]});
                             }
 
                             if (info_channel == null)

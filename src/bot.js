@@ -13,14 +13,21 @@ const PreviewCommand = require("./commands/preview.js");
 const PreviewFancyCommand = require("./commands/previewfancy.js");
 const ListCommand = require("./commands/list.js");
 
-const { Client, MessageEmbed } = require("discord.js");
-const client = new Client();
+const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
+const client = new Client({ 
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages, 
+        GatewayIntentBits.MessageContent
+    ] 
+});
 
 const {Stickies} = require("./sticky.js");
 global.stickies = new Stickies();
 
-client.fetchApplication().then(app => global.discordApplication = app);
+//client.fetchApplication().then(app => global.discordApplication = app);
 client.on("ready", () => {  
+    global.discordApplication = client.application;
     global.stickies.LoadStickies(client.guilds, () => {
         // Delete all Sticky bot messages in the last 50 messages for every server's channels
         for (const [server_id, server] of client.guilds.cache)
@@ -70,7 +77,7 @@ client.on("guildDelete", guild => {
     });
 });
 
-client.on("message", msg => {
+client.on("messageCreate", msg => {
     // Originally it was gonna ignore all bots, but it probably makes more sense to just ignore itself
     //    if (msg.author.bot)
     //        return;
@@ -81,7 +88,7 @@ client.on("message", msg => {
     
     if (msgParams[0] == "!sticky")
     {   
-        if (!msg.member.hasPermission("MANAGE_CHANNELS"))
+        if (!msg.member.permissions.has("MANAGE_CHANNELS"))
         {
             BotFunctions.SimpleMessage(msg.channel, "You need the 'Manage Channels' permission.", "Insufficient Privileges!", Colors["error"]);
             return; 
@@ -114,21 +121,50 @@ client.on("message", msg => {
                 ListCommand.Run(client, msg);
             break;
             default:
-                const embed = new MessageEmbed();
-                embed.color = Colors["info"];
-                embed.title = "Commands";
-
-                embed.addField("!sticky add <channel id> <discord message>", "Add a sticky to a channel.");
-                embed.addField("!sticky addfancy <channel id>", "Start the process of adding a fancy sticky to a channel.");
-                embed.addField("!sticky edit <channel id> <sticky id>", "Start the modification process for the provided sticky.");
-                embed.addField("!sticky remove <channel id> <sticky id>", "Remove a sticky from a channel.");
-                embed.addField("!sticky removeall <channel id>", "Remove all stickies from a channel.");
-                embed.addField("!sticky preview <message>", "Preview what a sticky looks like.");
-                embed.addField("!sticky previewfancy", "Start the process of creating and previewing a fancy sticky.");
-                embed.addField("!sticky list <channel id>", "List stickies in a channel");
-                embed.addField("!sticky list", "List all channels with stickies"); 
-
-                msg.channel.send(embed);
+                msg.channel.send({
+                    embeds: [{
+                        title: "Commands",
+                        color: Colors["info"],
+                        fields: [
+                            {
+                                name: "!sticky add <channel id> <discord message>",
+                                value: "Add a sticky to a channel."
+                            },
+                            {
+                                name: "!sticky addfancy <channel id>",
+                                value: "Start the process of adding a fancy sticky to a channel."
+                            },
+                            {
+                                name: "!sticky edit <channel id> <sticky id>",
+                                value: "Start the modification process for the provided sticky."
+                            },
+                            {
+                                name: "!sticky remove <channel id> <sticky id>",
+                                value: "Remove a sticky from a channel."
+                            },
+                            {
+                                name: "!sticky removeall <channel id>",
+                                value: "Remove all stickies from a channel."
+                            },
+                            {
+                                name: "!sticky preview <message>",
+                                value: "Preview what a sticky looks like."
+                            },
+                            {
+                                name: "!sticky previewfancy",
+                                value: "Start the process of creating and previewing a fancy sticky."
+                            },
+                            {
+                                name: "!sticky list <channel id>",
+                                value: "List stickies in a channel."
+                            },
+                            {
+                                name: "!sticky list",
+                                value: "List all channels with stickies."
+                            }
+                        ]
+                    }]
+                });
         }
     }  
     else

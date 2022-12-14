@@ -3,7 +3,7 @@ const BotFunctions = require("../bot_functions.js");
 const Errors = require("../messages/errors.js");
 const Colors = require("../messages/colors.js");
 
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 
 function Run(client, msg)
 {
@@ -11,6 +11,11 @@ function Run(client, msg)
     const server_id = msg.guild.id;
     const channel_id = BotFunctions.GetMessageChannelID(msgParams[2]);
 
+    if (channel_id == null)
+    {
+        console.log("List all channels with stickies")
+    }
+    
     client.channels.fetch(channel_id).then(channel => {
         BotFunctions.ShowChannelStickies(server_id, channel, msg.channel);
     }).catch(_ => {
@@ -21,8 +26,8 @@ function Run(client, msg)
         if (typeof(stickyList) == "string")
             return BotFunctions.SimpleMessage(msg.channel, stickyList, "Error listing stickies", Colors["error"]);
 
-        const listEmbed = new MessageEmbed();
-        listEmbed.color = Colors["info"];
+        const listEmbed = new EmbedBuilder();
+        listEmbed.setColor(Colors["info"]);
         listEmbed.title = global.discordApplication.name;
 
         if (stickyList != null && stickyList != false)
@@ -40,7 +45,7 @@ function Run(client, msg)
                             Count: ${val.count}
                         `;
 
-                        listEmbed.addField("Stickies", channelListStr);  
+                        listEmbed.addFields({name: "Stickies", value: channelListStr});  
                     }
 
                     if (array.length - 1 == index)
@@ -48,7 +53,7 @@ function Run(client, msg)
                         if (listEmbed.fields.length <= 0)
                             BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", Colors["error"]);
                         else
-                            msg.channel.send(listEmbed);
+                            msg.channel.send({embeds: [listEmbed]});
                     }
                         
                 }).catch(_ => {
