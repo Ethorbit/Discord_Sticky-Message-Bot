@@ -50,11 +50,6 @@ function Run(client, msg)
                             BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", Colors["error"]);
                         else
                             msg.channel.send({embeds: [listEmbed]});
-
-                        //if (listEmbed.fields.length <= 0)
-                        //    BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", Colors["error"]);
-                        //else
-                        //msg.channel.send({embeds: [listEmbed]});
                     }
                 }).catch(err => {
                     console.error(err);
