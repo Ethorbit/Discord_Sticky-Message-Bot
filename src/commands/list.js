@@ -25,7 +25,7 @@ function Run(client, msg)
         if (stickyList != null && stickyList != false)
         {
             let bStickiesExist = false;
-            let bEmbedHasFields = false;
+            let iChannelsWithStickies = 0;
             let szChannelList = "";
             stickyList.forEach((val, index, array) => {
                 bStickiesExist = true;
@@ -39,14 +39,14 @@ function Run(client, msg)
                         `;
 
                         listEmbed.addFields({name: "Stickies", value: szChannelList});  
-                        bEmbedHasFields = true;
+                        iChannelsWithStickies++;
                     }
                     else 
                         bEmbedHasFields = false;
 
                     if (array.length - 1 == index)
                     {
-                        if (!bEmbedHasFields)
+                        if (iChannelsWithStickies <= 0)
                             BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", Colors["error"]);
                         else
                             msg.channel.send({embeds: [listEmbed]});
