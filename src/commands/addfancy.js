@@ -26,7 +26,7 @@ function Run(client, msg)
                     BotFunctions.SimpleMessage(msg.channel, `
                         ID: ${val} 
                         Channel: ${channel.toString()}
-                    `, "Created sticky!", "success",
+                    `, "Created sticky!", Colors["success"],
                     () => {
                         BotFunctions.ShowChannelStickies(server_id, channel, null);
                     });

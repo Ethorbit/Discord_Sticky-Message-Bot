@@ -13,25 +13,32 @@ var exported = {
 
     SimpleMessage: function(channel, message, title, color, cb)
     {   
-        const embed = new EmbedBuilder();
+        try
+        {
+            const embed = new EmbedBuilder();
 
-        if (color != undefined)
-            embed.setColor(color);
+            if (color != undefined)
+                embed.setColor(color);
 
-        if (title != undefined)
-            embed.setTitle(title);
+            if (title != undefined)
+                embed.setTitle(title);
 
-        // Stupid workaround thanks to discord.js not supporting more than 1 single space inside embeds
-        // My god, please someone get them to fix this..
-        const fake_space = " ឵឵  ឵឵";
-        const discordjs_not_doing_its_job = message.replace(/([^\S\r\n][^\S\r\n])/gm, fake_space);
+            // Stupid workaround thanks to discord.js not supporting more than 1 single space inside embeds
+            // My god, please someone get them to fix this..
+            const fake_space = " ឵឵  ឵឵";
+            const discordjs_not_doing_its_job = message.replace(/([^\S\r\n][^\S\r\n])/gm, fake_space);
        
-        embed.setDescription(discordjs_not_doing_its_job); 
+            embed.setDescription(discordjs_not_doing_its_job); 
         
-        channel.send({embeds: [embed]}).then(sentMessage => {
-            if (typeof(cb) == "function") 
-                cb(sentMessage) 
-        });
+            channel.send({embeds: [embed]}).then(sentMessage => {
+                if (typeof(cb) == "function") 
+                    cb(sentMessage) 
+            });
+        }
+        catch(err)
+        {
+            console.error("Failed to create a Simple Message", err);
+        }
     },
 
     WaitForUserResponse : function(channel, user, time, cb) // Wait for specific user to respond in specified channel, send result to callback
