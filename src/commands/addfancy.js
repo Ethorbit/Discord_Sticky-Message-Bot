@@ -4,6 +4,8 @@ const BotFunctions = require("../bot_functions.js");
 const Errors = require("../messages/errors.js");
 const Colors = require("../messages/colors.js");
 
+const { ChannelType } = require("discord.js");
+
 function Run(client, msg)
 {
     const msgParams = BotFunctions.GetCommandParamaters(msg.content);
@@ -11,7 +13,7 @@ function Run(client, msg)
     const channel_id = BotFunctions.GetMessageChannelID(msgParams[2]);
 
     client.channels.fetch(channel_id).then(channel => {
-        if (channel.type != "text") 
+        if (channel.type != ChannelType.GuildText) 
             return BotFunctions.SimpleMessage(msg.channel, "The passed channel must be a text channel that you can post messages in.", "Incorrect channel type!", Colors["error"]);
         
         FancyFunctions.GetMessagePropertiesFromUser(msg, (hex_color, title, message) => {
