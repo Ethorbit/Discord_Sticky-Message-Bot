@@ -48,6 +48,11 @@ var exported = {
         return message.replace("#", "").replace("<", "").replace(">", "");
     },
 
+    GetCommandParamaters(command)
+    {
+        return command.toLowerCase().split(" ").filter(i => i);
+    },
+    
     SendStickyMessage: function(channel, sticky, cb)
     {
         if (sticky["is_embed"])

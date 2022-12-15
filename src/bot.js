@@ -25,7 +25,6 @@ const client = new Client({
 const {Stickies} = require("./sticky.js");
 global.stickies = new Stickies();
 
-//client.fetchApplication().then(app => global.discordApplication = app);
 client.on("ready", () => {  
     global.discordApplication = client.application;
     global.stickies.LoadStickies(client.guilds, () => {
