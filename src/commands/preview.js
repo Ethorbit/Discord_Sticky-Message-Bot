@@ -3,7 +3,7 @@ const BotFunctions = require("../bot_functions.js");
 
 function Run(client, msg)
 {
-    const msgParams = msg.content.toLowerCase().split(" ");
+    const msgParams = BotFunctions.GetCommandParamaters(msg.content);
     const server_id = msg.guild.id;
     const input_message = msgParams[2];
     const test_id = BotFunctions.GetMessageChannelID(input_message);

@@ -83,7 +83,7 @@ client.on("messageCreate", msg => {
     if (msg.author.bot && msg.author.id == global.discordApplication.id)
         return;
     
-    const msgParams = msg.content.toLowerCase().split(" ");
+    const msgParams = BotFunctions.GetCommandParamaters(msg.content);
     
     if (msgParams[0] == "!sticky")
     {   

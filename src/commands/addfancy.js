@@ -6,7 +6,7 @@ const Colors = require("../messages/colors.js");
 
 function Run(client, msg)
 {
-    const msgParams = msg.content.toLowerCase().split(" ");
+    const msgParams = BotFunctions.GetCommandParamaters(msg.content);
     const server_id = msg.guild.id;
     const channel_id = BotFunctions.GetMessageChannelID(msgParams[2]);
 
