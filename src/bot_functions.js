@@ -80,11 +80,40 @@ var exported = {
         }
     },
 
+    UpdateLastStickyTime(channel, time)
+    {
+        if (channel != undefined)
+        {
+            time = time == null ? Date.now() : time;
+            channel.lastStickyTime = time;
+        }
+    },
+
+    ResetLastStickyTime(channel)
+    {
+        if (channel != undefined)
+            channel.lastStickyTime = STICKY_COOLDOWN;
+    },
+    
+    GetLastStickyTime(channel)
+    {
+        if (channel != undefined)
+        {
+            if (channel.lastStickyTime == undefined)
+                this.ResetLastStickyTime(channel);
+
+            return Date.now() - channel.lastStickyTime;
+        }
+    },
+  
+    //
+    // TODO: isolate all list-specific (info_channel) code, it's a lot of clutter.
+    //
     ShowChannelStickies: function(server_id, channel, info_channel) // Show all stickies saved to a channel
     {
         if (global.stickies.ValidStickyChannel(server_id, channel.id))
         {
-            if (info_channel != null || channel.lastStickyTime == null || Date.now() - channel.lastStickyTime >= STICKY_COOLDOWN) // Wait a bit, we don't wanna interrupt conversations
+            if (info_channel != null || this.GetLastStickyTime(channel) >= STICKY_COOLDOWN) // Wait a bit, we don't wanna interrupt conversations
             {
                 // Delete previous sticky messages we posted
                 if (info_channel == null && channel.lastStickyMessages != null)
@@ -116,7 +145,7 @@ var exported = {
                             }
 
                             if (info_channel == null)
-                                channel.lastStickyTime = Date.now();
+                                this.UpdateLastStickyTime(channel);
 
                             this.SendStickyMessage(sendChannel, val, (sentMessage) => {
                                 if (info_channel == null)
@@ -134,8 +163,8 @@ var exported = {
             }
             else
             {
-                // Reset time when someone posts a message so it never interrupts people
-                channel.lastStickyTime = Date.now();
+                // So it never interrupts people
+                this.UpdateLastStickyTime(channel);
             }
         }
         else if (info_channel != null)

@@ -33,6 +33,7 @@ function Run(client, msg)
                         `, "Created sticky!", Colors["success"],
                         () => {
                             BotFunctions.DeleteMessage(sentMessage)
+                            BotFunctions.ResetLastStickyTime(channel);
                             BotFunctions.ShowChannelStickies(server_id, channel, null);
                         });
                     }

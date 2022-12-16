@@ -28,6 +28,7 @@ function Run(client, msg)
                         Channel: ${channel.toString()}
                     `, "Created sticky!", Colors["success"],
                     () => {
+                        BotFunctions.ResetLastStickyTime(channel);
                         BotFunctions.ShowChannelStickies(server_id, channel, null);
                     });
                 }

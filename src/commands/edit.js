@@ -12,7 +12,7 @@ function Run(client, msg)
     const channel_id = BotFunctions.GetMessageChannelID(msgParams[2]);
     const sticky_id = msgParams[3];
 
-    client.channels.fetch(channel_id).then(_ => {
+    client.channels.fetch(channel_id).then(channel => {
         if (!global.stickies.ValidSticky(server_id, channel_id, sticky_id))
             return BotFunctions.SimpleMessage(msg.channel, Errors["no_sticky_id"], "Error editing sticky", Colors["error"]);  
         
@@ -52,7 +52,11 @@ function Run(client, msg)
                                     return BotFunctions.SimpleMessage(msg.channel, val, "Error changing sticky", Colors["error"], () => BotFunctions.DeleteMessage(sentMessage));
                                 
                                 if (val)
-                                    BotFunctions.SimpleMessage(msg.channel, `Successfully changed Sticky #${sticky_id}'s ${key}.`, "Modified sticky", Colors["success"], () => BotFunctions.DeleteMessage(sentMessage));
+                                {
+                                    BotFunctions.SimpleMessage(msg.channel, `Successfully changed Sticky #${sticky_id}'s ${key}.`, "Modified sticky", Colors["success"], () => BotFunctions.DeleteMessage(sentMessage)); 
+                                    BotFunctions.ResetLastStickyTime(channel);
+                                    BotFunctions.ShowChannelStickies(server_id, channel, null);
+                                }
                                 else
                                     BotFunctions.SimpleMessage(msg.channel, Errors["no_sticky_id"], "Error editing sticky", Colors["error"], () => BotFunctions.DeleteMessage(sentMessage));  
                             });
