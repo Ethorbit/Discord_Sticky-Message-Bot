@@ -24,8 +24,11 @@ function Run(client, msg)
                 BotFunctions.DeleteMessage(sentMessage);
 
                 if (key !== "message" && key !== "title" && key !== "hex_color" && key !== "is_embed")
-                    return BotFunctions.SimpleMessage(msg.channel, "The value you provided is not a valid sticky property.", "Error", Colors["error"]);
-
+                {
+                    BotFunctions.SimpleMessage(msg.channel, "The value you provided is not a valid sticky property.", "Error", Colors["error"]);
+                    return Run(client, msg); // Restart command 
+                }
+                
                 BotFunctions.SimpleMessage(msg.channel, `What do you want to set #${sticky_id} sticky's ${key} to?`, "What value?", Colors["question"], (sentMessage) => {  
                     BotFunctions.WaitForUserResponse(msg.channel, msg.member, key == "message" ? 600000 : 40000, response => {
                         BotFunctions.DeleteMessage(sentMessage);
@@ -39,8 +42,7 @@ function Run(client, msg)
                             catch 
                             {
                                 BotFunctions.SimpleMessage(msg.channel, "The color you passed is not valid", "Incorrect color!", Colors["error"]);
-                                Run(client, msg); // Restart process.
-                                return;
+                                return Run(client, msg); // Restart command.
                             }
                         }
                         
