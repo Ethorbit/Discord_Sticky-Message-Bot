@@ -3,6 +3,8 @@ const BotFunctions = require("../bot_functions.js");
 const Errors = require("../messages/errors.js");
 const Colors = require("../messages/colors.js");
 
+const { resolveColor } = require("discord.js");
+
 function Run(client, msg)
 {
     const msgParams = BotFunctions.GetCommandParamaters(msg.content);
@@ -28,6 +30,20 @@ function Run(client, msg)
                     BotFunctions.WaitForUserResponse(msg.channel, msg.member, key == "message" ? 600000 : 40000, response => {
                         BotFunctions.DeleteMessage(sentMessage);
 
+                        if (key == "hex_color")
+                        {
+                            try
+                            {
+                                resolveColor(response.content)
+                            }
+                            catch 
+                            {
+                                BotFunctions.SimpleMessage(msg.channel, "The color you passed is not valid", "Incorrect color!", Colors["error"]);
+                                Run(client, msg); // Restart process.
+                                return;
+                            }
+                        }
+                        
                         BotFunctions.SimpleMessage(msg.channel, `Please wait while I change that sticky's ${key}...`, "Processing", Colors["sticky"], (sentMessage) => {
                             global.stickies.EditSticky(server_id, channel_id, sticky_id, key, response.content, (val) => {
                                 if (typeof(val) == "string")

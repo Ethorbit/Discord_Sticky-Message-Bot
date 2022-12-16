@@ -2,7 +2,7 @@ const Errors = require("./messages/errors.js");
 const Colors = require("./messages/colors.js");
 const STICKY_COOLDOWN = isNaN(parseInt(process.env.STICKY_COOLDOWN)) ? 20000 : process.env.STICKY_COOLDOWN; 
 
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, resolveColor } = require("discord.js");
 
 var exported = {
     DeleteMessage: function(message)
@@ -19,7 +19,7 @@ var exported = {
 
             if (color != undefined)
                 embed.setColor(color);
-
+            
             if (title != undefined)
                 embed.setTitle(title);
 
