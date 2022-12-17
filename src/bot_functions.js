@@ -7,7 +7,7 @@ const { EmbedBuilder, resolveColor } = require("discord.js");
 var exported = {
     DeleteMessage: function(message, cb)
     {
-        if (message == null || typeof(message.delete) !== "function" || !message.deleted)
+        if (message == null || typeof(message.delete) !== "function" || message.deleted)
             return;
         
         try
