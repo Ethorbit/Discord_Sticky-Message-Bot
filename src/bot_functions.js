@@ -5,10 +5,22 @@ const STICKY_COOLDOWN = isNaN(parseInt(process.env.STICKY_COOLDOWN)) ? 20000 : p
 const { EmbedBuilder, resolveColor } = require("discord.js");
 
 var exported = {
-    DeleteMessage: function(message)
+    DeleteMessage: function(message, cb)
     {
-        if (message != null && typeof(message.delete) == "function" && !message.deleted)
-            message.delete();
+        if (message == null || typeof(message.delete) !== "function" || !message.deleted)
+            return;
+        
+        try
+        {
+            message.delete().then(_ => {
+                if (typeof cb === "function")
+                    cb(msg);
+            });
+        }
+        catch (err) 
+        {
+            console.error(`Failed to delete message: ${err}`);
+        }
     },
 
     SimpleMessage: function(channel, message, title, color, cb)
@@ -17,10 +29,10 @@ var exported = {
         {
             const embed = new EmbedBuilder();
 
-            if (color != undefined)
+            if (color != null)
                 embed.setColor(color);
             
-            if (title != undefined)
+            if (title != null)
                 embed.setTitle(title);
 
             // Stupid workaround thanks to discord.js not supporting more than 1 single space inside embeds
@@ -37,27 +49,41 @@ var exported = {
         }
         catch(err)
         {
-            console.error("Failed to create a Simple Message", err);
+            console.error(`Failed to create a Simple Message: ${err}`);
         }
     },
 
-    WaitForUserResponse : function(channel, user, time, cb) // Wait for specific user to respond in specified channel, send result to callback
+    WaitForUserResponse: function(channel, user, time, cb) // Wait for specific user to respond in specified channel, send result to callback
     {
-        const collector = channel.createMessageCollector((m) => m.member == user, {time: time}).on("collect", (response) => {
-            cb(response);
-            collector.stop();
-        });
+        try 
+        {
+            const collector = channel.createMessageCollector((m) => m.member == user, {time: time}).on("collect", (response) => {
+                if (typeof cb === "function")
+                    cb(response);
+                
+                collector.stop();
+            });
+        }
+        catch (err)
+        {
+            console.error(`Failed to create Message Collector': ${err}`);
+        }
     },
 
     GetMessageChannelID: function(message)
     {
-        if (typeof(message) != "string") return;
+        if (typeof(message) !== "string") return;
         return message.replace("#", "").replace("<", "").replace(">", "");
     },
 
-    GetCommandParamaters(command)
+    GetCommandParamaters: function(command)
     {
-        return command.toLowerCase().split(" ").filter(i => i);
+        return typeof command !== "string" ? [""] : command.toLowerCase().split(" ").filter(i => i);
+    },
+   
+    GetStickyCooldown: function()
+    {
+        return STICKY_COOLDOWN;
     },
     
     SendStickyMessage: function(channel, sticky, cb)
@@ -71,104 +97,117 @@ var exported = {
         }
         else
         {
-            channel.send(sticky["message"]).then(sentMessage => {
-                sentMessage.suppressEmbeds(true);
+            try 
+            {
+                channel.send(sticky["message"]).then(sentMessage => {
+                    sentMessage.suppressEmbeds(true);
 
-                if (typeof(cb) == "function")
-                    cb(sentMessage);
-            });
+                    if (typeof(cb) === "function")
+                        cb(sentMessage);
+                });
+            }
+            catch (err) 
+            {
+                console.error(`Failed to send sticky message: ${err}`);
+            }
         }
     },
 
-    UpdateLastStickyTime(channel, time)
+    UpdateLastStickyTime: function(channel, time)
     {
-        if (channel != undefined)
+        if (channel != null)
         {
             time = time == null ? Date.now() : time;
             channel.lastStickyTime = time;
         }
     },
 
-    ResetLastStickyTime(channel)
+    ResetLastStickyTime: function(channel)
     {
-        if (channel != undefined)
+        if (channel != null)
             channel.lastStickyTime = STICKY_COOLDOWN;
     },
     
-    GetLastStickyTime(channel)
+    GetLastStickyTime: function(channel)
     {
-        if (channel != undefined)
+        if (channel != null)
         {
-            if (channel.lastStickyTime == undefined)
+            if (channel.lastStickyTime == null)
                 this.ResetLastStickyTime(channel);
 
             return Date.now() - channel.lastStickyTime;
         }
     },
-  
-    //
-    // TODO: isolate all list-specific (info_channel) code, it's a lot of clutter.
-    //
-    ShowChannelStickies: function(server_id, channel, info_channel) // Show all stickies saved to a channel
+
+    GetLastStickyMessages: function(channel) 
     {
-        if (global.stickies.ValidStickyChannel(server_id, channel.id))
-        {
-            if (info_channel != null || this.GetLastStickyTime(channel) >= STICKY_COOLDOWN) // Wait a bit, we don't wanna interrupt conversations
-            {
-                // Delete previous sticky messages we posted
-                if (info_channel == null && channel.lastStickyMessages != null)
-                {
-                    channel.lastStickyMessages.forEach((val) => {
-                        if (val != null)
-                            this.DeleteMessage(val);
-                    });
-                }
+        if (!Array.isArray(channel.lastStickyMessages))
+            channel.lastStickyMessages = new Array();
         
-                if (channel.lastStickyMessages == null)
-                    channel.lastStickyMessages = new Array();
-                else
-                    channel.lastStickyMessages.length = 0;
+        return channel.lastStickyMessages;
+    },
+    
+    DeleteLastStickyMessages: function(channel)
+    {
+        if (channel == null || !Array.isArray(channel.lastStickyMessages))
+            return;
         
-                const stickyList = global.stickies.GetStickies(server_id, channel.id);
-        
-                try
-                {
-                    if (stickyList != null && stickyList != false)
-                    {
-                        stickyList.forEach((val, index, _) => {
-                            const sendChannel = info_channel != null ? info_channel : channel;
-                            if (info_channel != null)
-                            {
-                                const stickyEmbed = new EmbedBuilder();
-                                stickyEmbed.setTitle(`Sticky #${index + 1}`);
-                                sendChannel.send({embeds: [stickyEmbed]});
-                            }
+        channel.lastStickyMessages.forEach((msg) => {
+            if (msg == null) return;
+            this.DeleteMessage(msg, _ => {
+                // Now that it's officially deleted, we can remove it from the array 
+                channel.lastStickyMessages.filter(element => { 
+                    if (element === msg) 
+                        console.log("Removal of lastStickyMessages element has succeeded");
 
-                            if (info_channel == null)
-                                this.UpdateLastStickyTime(channel);
+                    return element !== msg; 
+                });
+            });
+        });
+    },
+    
+    ShowChannelStickies: function(server_id, channel)
+    { 
+        if (!global.stickies.ValidStickyChannel(server_id, channel.id))
+            return; 
+        if (this.GetLastStickyTime(channel) < this.GetStickyCooldown()) // Wait a bit, we don't wanna interrupt conversations
+            return this.UpdateLastStickyTime(channel);  
+        
+        this.DeleteLastStickyMessages(channel);
+        
+        const stickyList = global.stickies.GetStickies(server_id, channel.id);
+        if (!Array.isArray(stickyList))
+            return;
 
-                            this.SendStickyMessage(sendChannel, val, (sentMessage) => {
-                                if (info_channel == null)
-                                    channel.lastStickyMessages.push(sentMessage);
-                            });
-                        });
-                    }
-                    else if (info_channel != null)
-                        this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", Colors["error"]);
-                }
-                catch (error)
-                {
-                    console.error(error.message);
-                }
-            }
-            else
-            {
-                // So it never interrupts people
-                this.UpdateLastStickyTime(channel);
-            }
-        }
-        else if (info_channel != null)
+        stickyList.forEach((val, index, _) => {
+            this.UpdateLastStickyTime(channel); 
+            
+            this.SendStickyMessage(channel, val, (sentMessage) => {
+                this.UpdateLastStickyTime(channel); // Update again, because sometimes stickies can take a while to appear (API rate limits)
+                this.GetLastStickyMessages(channel).push(sentMessage);
+            });
+        });
+    },
+    
+    ListChannelStickies: function (server_id, channel, info_channel)
+    { 
+        if (!global.stickies.ValidStickyChannel(server_id, channel.id))
             this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", Colors["error"]);
+    
+        const stickyList = global.stickies.GetStickies(server_id, channel.id);
+        if (!Array.isArray(stickyList))
+            return;
+        else 
+            this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", Colors["error"]);
+     
+        stickyList.forEach((val, index, _) => { 
+            const stickyEmbed = new EmbedBuilder();
+            stickyEmbed.setTitle(`Sticky #${index + 1}`);
+            info_channel.send({embeds: [stickyEmbed]}).then(_ => {
+                console.log(val);
+                this.SendStickyMessage(channel, val);
+            });
+        });
     }
 };
 

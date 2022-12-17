@@ -65,7 +65,7 @@ function Run(client, msg)
     
     // They want to list a specific channel's stickies
     client.channels.fetch(channel_id).then(channel => {
-        BotFunctions.ShowChannelStickies(server_id, channel, msg.channel);
+        BotFunctions.ListChannelStickies(server_id, channel, msg.channel);
     }).catch(_ => {
         if (channel_id != null)
             return BotFunctions.SimpleMessage(msg.channel, Errors["invalid_channel"], "Error getting channel ID", Colors["error"]);
