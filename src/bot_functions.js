@@ -2,24 +2,25 @@ const Errors = require("./messages/errors.js");
 const Colors = require("./messages/colors.js");
 const STICKY_COOLDOWN = isNaN(parseInt(process.env.STICKY_COOLDOWN)) ? 20000 : process.env.STICKY_COOLDOWN; 
 
-const { EmbedBuilder, resolveColor } = require("discord.js");
+const { EmbedBuilder, resolveColor, Message } = require("discord.js");
 
 var exported = {
     DeleteMessage: function(message, cb)
     {
-        if (message == null || typeof(message.delete) !== "function" || message.deleted)
+        if (message == null || typeof message.delete !== "function" || message.deleted)
             return;
         
-        try
+        try 
         {
             message.delete().then(_ => {
                 if (typeof cb === "function")
-                    cb(msg);
+                    cb(message);
+            }).catch(err => {
+                console.error(`Error during message deletion: ${err}`);
             });
         }
-        catch (err) 
-        {
-            console.error(`Failed to delete message: ${err}`);
+        catch (err) {
+            console.error(`Error deleting message: ${err}`);
         }
     },
 
@@ -36,7 +37,6 @@ var exported = {
                 embed.setTitle(title);
 
             // Stupid workaround thanks to discord.js not supporting more than 1 single space inside embeds
-            // My god, please someone get them to fix this..
             const fake_space = " ឵឵  ឵឵";
             const discordjs_not_doing_its_job = message.replace(/([^\S\r\n][^\S\r\n])/gm, fake_space);
        
@@ -45,6 +45,8 @@ var exported = {
             channel.send({embeds: [embed]}).then(sentMessage => {
                 if (typeof(cb) == "function") 
                     cb(sentMessage) 
+            }).catch(err => {                    
+                console.error(`Failed to create a Simple Message: ${err}`);
             });
         }
         catch(err)
@@ -60,8 +62,10 @@ var exported = {
             const collector = channel.createMessageCollector((m) => m.member == user, {time: time}).on("collect", (response) => {
                 if (typeof cb === "function")
                     cb(response);
-                
+            
                 collector.stop();
+            }).catch(err => {
+                console.error(`Failed during Message Collector': ${err}`);
             });
         }
         catch (err)
@@ -72,7 +76,7 @@ var exported = {
 
     GetMessageChannelID: function(message)
     {
-        if (typeof(message) !== "string") return;
+        if (typeof message !== "string") return "";
         return message.replace("#", "").replace("<", "").replace(">", "");
     },
 
@@ -91,25 +95,20 @@ var exported = {
         if (sticky["is_embed"])
         {
             this.SimpleMessage(channel, sticky["message"], sticky["title"], sticky["hex_color"], sentMessage => {
-                if (typeof(cb) == "function")
+                if (typeof cb == "function")
                     cb(sentMessage);
             });
         }
         else
         {
-            try 
-            {
-                channel.send(sticky["message"]).then(sentMessage => {
-                    sentMessage.suppressEmbeds(true);
+            channel.send(sticky["message"]).then(sentMessage => {
+                sentMessage.suppressEmbeds(true);
 
-                    if (typeof(cb) === "function")
-                        cb(sentMessage);
-                });
-            }
-            catch (err) 
-            {
+                if (typeof cb === "function")
+                    cb(sentMessage);
+            }).catch(err => {                        
                 console.error(`Failed to send sticky message: ${err}`);
-            }
+            });
         }
     },
 
@@ -156,12 +155,7 @@ var exported = {
             if (msg == null) return;
             this.DeleteMessage(msg, _ => {
                 // Now that it's officially deleted, we can remove it from the array 
-                channel.lastStickyMessages.filter(element => { 
-                    if (element === msg) 
-                        console.log("Removal of lastStickyMessages element has succeeded");
-
-                    return element !== msg; 
-                });
+                channel.lastStickyMessages = channel.lastStickyMessages.filter(element => { return element !== msg; });
             });
         });
     },
@@ -204,8 +198,10 @@ var exported = {
             const stickyEmbed = new EmbedBuilder();
             stickyEmbed.setTitle(`Sticky #${index + 1}`);
             info_channel.send({embeds: [stickyEmbed]}).then(_ => {
-                console.log(val);
-                this.SendStickyMessage(channel, val);
+                console.log("Is it sending sticky message?");
+                this.SendStickyMessage(info_channel, val);
+            }).catch(err => {
+                console.log(`Error listing sticky: ${err}`);
             });
         });
     }
