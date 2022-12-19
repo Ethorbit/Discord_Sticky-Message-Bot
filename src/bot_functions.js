@@ -189,7 +189,9 @@ var exported = {
         const stickyList = global.stickies.GetStickies(server_id, channel.id);
         if (!Array.isArray(stickyList))
             return;
-
+        if (stickyList.length <= 0) 
+            return this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", Colors["error"]);
+            
         stickyList.forEach((val, index, _) => { 
             const cpVal = Object.assign({}, val); // Make a copy, otherwise our edits below will change the actual stickies
             cpVal.is_embed = true;
