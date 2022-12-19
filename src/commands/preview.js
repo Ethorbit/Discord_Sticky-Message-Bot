@@ -1,5 +1,6 @@
 // Preview command
 const BotFunctions = require("../bot_functions.js");
+const Colors = require("../messages/colors.js");
 
 function Run(client, msg)
 {
@@ -10,16 +11,16 @@ function Run(client, msg)
 
     if (input_message != null)
     {
-        client.channels.fetch(test_id).then(channel => {
-            BotFunctions.ShowChannelStickies(server_id, channel, msg.channel);
-        }).catch(_ => {
-            const originalMsg = msg.content.replace(msgParams[0], "").replace(msgParams[1], "");
+        const originalMsg = msg.content.replace(msgParams[0], "").replace(msgParams[1], "");
             
-            msg.channel.send(originalMsg).then(sentMessage => {
-                sentMessage.suppressEmbeds(true);
-            });
+        msg.channel.send(originalMsg).then(sentMessage => {
+            sentMessage.suppressEmbeds(true);
+        }).catch(err => {
+            console.error(`Error previewing message: ${err}`);
         });
     }
+    else 
+        BotFunctions.SimpleMessage(msg.channel, "You entered nothing.", "Empty message!", Colors["error"]);
 }   
 
 module.exports = {Run};
