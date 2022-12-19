@@ -12,7 +12,7 @@ function Run(client, msg)
     const channel_id = BotFunctions.GetMessageChannelID(msgParams[2]);
 
     // They want to list all channel stickies 
-    if (channel_id == null)
+    if (channel_id == null || channel_id.length <= 0)
     {
         const stickyList = global.stickies.GetStickies(server_id, null);
         if (typeof(stickyList) == "string")
@@ -61,6 +61,8 @@ function Run(client, msg)
         }
         else
             BotFunctions.SimpleMessage(msg.channel, Errors["no_stickies"], "Error listing stickies", Colors["error"]);
+    
+        return;
     }
     
     // They want to list a specific channel's stickies
