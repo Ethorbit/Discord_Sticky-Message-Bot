@@ -64,8 +64,6 @@ var exported = {
                     cb(response);
             
                 collector.stop();
-            }).catch(err => {
-                console.error(`Failed during Message Collector': ${err}`);
             });
         }
         catch (err)
@@ -164,7 +162,6 @@ var exported = {
     { 
         if (!global.stickies.ValidStickyChannel(server_id, channel.id))
             return; 
-        console.log(this.GetLastStickyTime(channel))
         if (this.GetLastStickyTime(channel) < this.GetStickyCooldown()) // Wait a bit, we don't wanna interrupt conversations
             return this.UpdateLastStickyTime(channel);  
         
