@@ -16,7 +16,11 @@ function Run(client, msg)
                         return BotFunctions.SimpleMessage(msg.channel, val, "Error deleting stickies", Colors["error"], () => BotFunctions.DeleteMessage(sentMessage));
                 
                 if (val)
+                {    
+                    BotFunctions.ResetLastStickyTime(channel);
+                    BotFunctions.ShowChannelStickies(server_id, channel);
                     BotFunctions.SimpleMessage(msg.channel, `Successfully removed all stickies from: ${channel.toString()}`, "Deleted stickies", Colors["success"], () => BotFunctions.DeleteMessage(sentMessage));
+                }
                 else
                     BotFunctions.SimpleMessage(msg.channel, "There were no stickies in that channel.", "Error deleting stickies", Colors["error"], () => BotFunctions.DeleteMessage(sentMessage)); 
             })
