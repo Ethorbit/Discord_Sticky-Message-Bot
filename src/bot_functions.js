@@ -116,7 +116,7 @@ var exported = {
     {
         if (channel != null)
         {
-            time = time == null ? Date.now() : time;
+            if (time == null) time = Date.now();
             channel.lastStickyTime = time;
         }
     },
@@ -164,6 +164,7 @@ var exported = {
     { 
         if (!global.stickies.ValidStickyChannel(server_id, channel.id))
             return; 
+        console.log(this.GetLastStickyTime(channel))
         if (this.GetLastStickyTime(channel) < this.GetStickyCooldown()) // Wait a bit, we don't wanna interrupt conversations
             return this.UpdateLastStickyTime(channel);  
         
@@ -182,27 +183,21 @@ var exported = {
             });
         });
     },
-    
+
     ListChannelStickies: function (server_id, channel, info_channel)
     { 
         if (!global.stickies.ValidStickyChannel(server_id, channel.id))
-            this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", Colors["error"]);
+            return this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", Colors["error"]);
     
         const stickyList = global.stickies.GetStickies(server_id, channel.id);
         if (!Array.isArray(stickyList))
             return;
-        else 
-            this.SimpleMessage(info_channel, Errors["no_stickies_channel"], "Error listing stickies", Colors["error"]);
-     
+
         stickyList.forEach((val, index, _) => { 
-            const stickyEmbed = new EmbedBuilder();
-            stickyEmbed.setTitle(`Sticky #${index + 1}`);
-            info_channel.send({embeds: [stickyEmbed]}).then(_ => {
-                console.log("Is it sending sticky message?");
-                this.SendStickyMessage(info_channel, val);
-            }).catch(err => {
-                console.log(`Error listing sticky: ${err}`);
-            });
+            const cpVal = Object.assign({}, val); // Make a copy, otherwise our edits below will change the actual stickies
+            cpVal.is_embed = true;
+            cpVal.title = `Sticky #${index + 1} ${cpVal.title != null ? cpVal.title : ""}`;  
+            this.SendStickyMessage(info_channel, cpVal);
         });
     }
 };
