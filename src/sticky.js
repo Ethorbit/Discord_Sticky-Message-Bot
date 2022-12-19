@@ -1,5 +1,5 @@
 const sql = require("sqlite3").verbose();
-const db_dir = process.env.BOT_DB_PATH || "./";
+const db_dir = process.env.DB_PATH || "./";
 
 // Keep trying until we can open the database, this bot won't work without it
 let db = null;
