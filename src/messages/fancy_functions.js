@@ -3,6 +3,8 @@ const Colors = require("../messages/colors.js");
 
 const CancelText = "The fancy sticky process has cancelled."
 
+const { resolveColor } = require("discord.js");
+
 function GetMessagePropertiesFromUser(msg, cb) // Gets the values from a user required to create a Fancy Sticky
 {
     try
@@ -21,9 +23,19 @@ function GetMessagePropertiesFromUser(msg, cb) // Gets the values from a user re
                     return;
                 }
                 
-                BotFunctions.DeleteMessage(sentMessage);
                 hex_color = response.content != "nocolor" ? response.content : "#FFF043";
-    
+                
+                try 
+                {
+                    resolveColor(hex_color)
+                }
+                catch (err)
+                {
+                    return BotFunctions.SimpleMessage(msg.channel, "The color you passed is not valid.", "Invalid color!", Colors["error"], _ => {
+                        GetMessagePropertiesFromUser(msg, cb); // Restart process.
+                    }); 
+                }
+                
                 // Get title
                 BotFunctions.SimpleMessage(msg.channel, "What should the title be? (Enter notitle to skip)", "What Title?", Colors["question"], sentMessage => {
                     BotFunctions.WaitForUserResponse(msg.channel, msg.member, 300000, response => {

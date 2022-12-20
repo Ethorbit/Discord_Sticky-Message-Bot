@@ -4,14 +4,16 @@ const BotFunctions = require("../bot_functions.js");
 const Errors = require("../messages/errors.js");
 const Colors = require("../messages/colors.js");
 
+const { ChannelType } = require("discord.js");
+
 function Run(client, msg)
 {
-    const msgParams = msg.content.toLowerCase().split(" ");
+    const msgParams = BotFunctions.GetCommandParamaters(msg.content);
     const server_id = msg.guild.id;
     const channel_id = BotFunctions.GetMessageChannelID(msgParams[2]);
 
     client.channels.fetch(channel_id).then(channel => {
-        if (channel.type != "text") 
+        if (channel.type != ChannelType.GuildText) 
             return BotFunctions.SimpleMessage(msg.channel, "The passed channel must be a text channel that you can post messages in.", "Incorrect channel type!", Colors["error"]);
         
         FancyFunctions.GetMessagePropertiesFromUser(msg, (hex_color, title, message) => {
@@ -24,8 +26,9 @@ function Run(client, msg)
                     BotFunctions.SimpleMessage(msg.channel, `
                         ID: ${val} 
                         Channel: ${channel.toString()}
-                    `, "Created sticky!", "success",
+                    `, "Created sticky!", Colors["success"],
                     () => {
+                        BotFunctions.ResetLastStickyTime(channel);
                         BotFunctions.ShowChannelStickies(server_id, channel, null);
                     });
                 }
