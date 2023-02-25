@@ -1,11 +1,10 @@
 FROM node:16.19.0-alpine3.17
-COPY ./entrypoint.sh /entrypoint.sh
-ARG GIT_BRANCH="main"
 WORKDIR /home/stickybot
+ARG GIT_BRANCH="main"
+ARG PUID=6969
+ARG PGID=6969
 ENV BOT_TOKEN=""
 ENV STICKY_COOLDOWN=""
-ENV PUID=6969 
-ENV PGID=6969
 VOLUME /botdb
 ENV DB_PATH="/botdb"
 RUN apk update &&\
@@ -21,5 +20,5 @@ RUN wget -q "https://github.com/Ethorbit/Discord_Sticky-Message-Bot/archive/${GI
     npm install
 RUN chown -R stickybot:stickybot ./ &&\ 
     chmod -R 700 ./ 
-ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
+USER stickybot
 CMD ["node", "./project/bot/src/bot.js"]
