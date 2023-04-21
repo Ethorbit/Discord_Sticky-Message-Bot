@@ -5,7 +5,7 @@
 
 A bot that keeps important stuff at the bottom of channels.
 
-![Example Image](https://i.imgur.com/2RUZb2q.png)
+![Example Image](example.png)
 
 ## [Tutorial](https://github.com/Ethorbit/Discord_Sticky-Message-Bot/wiki) | [Commands](https://github.com/Ethorbit/Discord_Sticky-Message-Bot/wiki/Bot-Commands) 
 
