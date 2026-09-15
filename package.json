@@ -10,7 +10,7 @@
     "discord.js": "^14.7.1",
     "dotenv": "^8.2.0",
     "find-config": "^1.0.0",
-    "sqlite3": "^5.0.0"
+    "sqlite3": "^6.0.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
