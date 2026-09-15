@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "A work in progress bot that keeps important stuff at the bottom of channels",
   "main": "index.js",
+  "engines": {
+    "node": ">=26.8.0"
+  },
   "dependencies": {
     "discord.js": "^14.7.1",
     "dotenv": "^8.2.0",

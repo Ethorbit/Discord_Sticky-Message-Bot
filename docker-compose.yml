@@ -3,7 +3,7 @@ services:
     build:
       context: .
     env_file:
-      - ../.env
+      - .env
     volumes:
       - sticky_bot:/botdb
 
